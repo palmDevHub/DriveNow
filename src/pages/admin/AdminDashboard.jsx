@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 
 export const AdminDashboard = () => {
-  const { cars, bookings, users, ADMIN_ANALYTICS, setCurrentView, updateBookingStatus } = useApp();
+  const { cars, bookings, users, ADMIN_ANALYTICS, setCurrentView, updateBookingStatus, t, language } = useApp();
 
   // Metrics computation
   const totalCarsCount = cars.length;
@@ -45,117 +45,117 @@ export const AdminDashboard = () => {
   return (
     <div className="space-y-8 pb-12">
       
-      {/* Header Bar - Matching Wireframe 11 */}
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-red-500 uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4" /> Admin Control Center
+          <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4" /> {t.adminControlCenter}
           </div>
           <h1 className="text-3xl font-extrabold text-white font-prompt mt-1">
-            แดชบอร์ดภาพรวมระบบ (Admin Dashboard)
+            {t.adminDashboardTitle}
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            สรุปข้อมูลสถิติ รายได้ รายการจองล่าสุด และการดำเนินงานระบบจองรถเช่า
+            {t.adminDashboardSub}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setCurrentView('admin-cars')}
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-red-950/50 transition"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-950/50 transition"
           >
-            <Plus className="w-4 h-4" /> เพิ่มข้อมูลรถใหม่
+            <Plus className="w-4 h-4" /> {t.addNewCarBtn}
           </button>
         </div>
       </div>
 
-      {/* 4 Metric Cards - Matching Wireframe 11 Top Stat Cards */}
+      {/* 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Metric 1: Total Cars */}
         <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <span className="text-xs text-slate-400 font-semibold">รถทั้งหมดในระบบ</span>
-            <div className="p-2.5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20">
+            <span className="text-xs text-slate-400 font-semibold">{t.totalCarsInSystem}</span>
+            <div className="p-2.5 rounded-2xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
               <Car className="w-5 h-5" />
             </div>
           </div>
           <div>
             <span className="text-3xl font-extrabold text-white font-prompt">{totalCarsCount}</span>
-            <span className="text-xs text-slate-400 ml-2">คัน</span>
+            <span className="text-xs text-slate-400 ml-2">{t.unitsCount}</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800">
-            <span className="text-emerald-400 font-bold">ว่าง {availableCarsCount} คัน</span>
+            <span className="text-emerald-400 font-bold">{t.availableCount} {availableCarsCount} {t.unitsCount}</span>
             <span>•</span>
-            <span className="text-blue-400 font-bold">กำลังเช่า {rentedCarsCount} คัน</span>
+            <span className="text-blue-400 font-bold">{t.rentedCount} {rentedCarsCount} {t.unitsCount}</span>
           </div>
         </div>
 
         {/* Metric 2: Active Bookings */}
         <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <span className="text-xs text-slate-400 font-semibold">รายการจองทั้งหมด</span>
+            <span className="text-xs text-slate-400 font-semibold">{t.totalBookingsInSystem}</span>
             <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
               <Calendar className="w-5 h-5" />
             </div>
           </div>
           <div>
             <span className="text-3xl font-extrabold text-white font-prompt">{bookings.length}</span>
-            <span className="text-xs text-slate-400 ml-2">รายการ</span>
+            <span className="text-xs text-slate-400 ml-2">{t.items}</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800">
-            <span className="text-amber-400 font-bold">รอยืนยัน {bookings.filter(b => b.status === 'รอยืนยัน').length} รายการ</span>
+            <span className="text-amber-400 font-bold">{t.pendingCount} {bookings.filter(b => b.status === 'รอยืนยัน').length} {t.items}</span>
           </div>
         </div>
 
         {/* Metric 3: Total Revenue */}
         <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <span className="text-xs text-slate-400 font-semibold">รายได้รวมสะสม</span>
+            <span className="text-xs text-slate-400 font-semibold">{t.totalRevenueAccumulated}</span>
             <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
           <div>
-            <span className="text-3xl font-extrabold text-emerald-400 font-prompt">{formatTHB(totalRevenue)}</span>
+            <span className="text-3xl font-extrabold text-emerald-400 font-prompt">{formatTHB(totalRevenue, language)}</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] text-emerald-400 pt-1 border-t border-slate-800">
-            <TrendingUp className="w-3.5 h-3.5" /> +18.4% จากเดือนที่แล้ว
+            <TrendingUp className="w-3.5 h-3.5" /> +18.4% {t.fromLastMonth}
           </div>
         </div>
 
         {/* Metric 4: Total Members */}
         <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <span className="text-xs text-slate-400 font-semibold">จำนวนสมาชิก</span>
+            <span className="text-xs text-slate-400 font-semibold">{t.totalMembersInSystem}</span>
             <div className="p-2.5 rounded-2xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
               <Users className="w-5 h-5" />
             </div>
           </div>
           <div>
             <span className="text-3xl font-extrabold text-white font-prompt">{totalMembers}</span>
-            <span className="text-xs text-slate-400 ml-2">คน</span>
+            <span className="text-xs text-slate-400 ml-2">{t.people}</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] text-slate-400 pt-1 border-t border-slate-800">
-            <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" /> สมัครใหม่เดือนนี้ +6 คน
+            <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" /> {t.newMembersThisMonth} +6
           </div>
         </div>
 
       </div>
 
-      {/* Analytics Charts Grid - Matching Wireframe 11 Center Charts */}
+      {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Revenue Line/Area Chart */}
+        {/* Revenue Area Chart */}
         <div className="lg:col-span-8 bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-4">
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-red-500" /> สถิติรายได้รายเดือน (บาท)
+                <TrendingUp className="w-4 h-4 text-blue-500" /> {t.monthlyRevenueStats}
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">กราฟแสดงแนวโน้มรายได้การเช่ารถตลอดปี 2025</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{t.revenueTrendSub}</p>
             </div>
-            <span className="text-xs font-mono font-bold text-red-400 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/30">
+            <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/30">
               2025 Revenue
             </span>
           </div>
@@ -173,7 +173,7 @@ export const AdminDashboard = () => {
                 <YAxis stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={(val) => `฿${val/1000}k`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
-                  formatter={(val) => [formatTHB(val), 'รายได้']}
+                  formatter={(val) => [formatTHB(val, language), language === 'en' ? 'Revenue' : 'รายได้']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#E50914" strokeWidth={3} fillOpacity={1} fill="url(#revenueGlow)" />
               </AreaChart>
@@ -185,9 +185,9 @@ export const AdminDashboard = () => {
         <div className="lg:col-span-4 bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-4">
           <div>
             <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <PieIcon className="w-4 h-4 text-red-500" /> สัดส่วนประเภทรถ
+              <PieIcon className="w-4 h-4 text-blue-500" /> {t.carTypeDistribution}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">การกระจายประเภทรถยนต์ในกองรถ</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{t.carDistributionSub}</p>
           </div>
 
           <div className="h-48 w-full flex items-center justify-center">
@@ -226,21 +226,21 @@ export const AdminDashboard = () => {
 
       </div>
 
-      {/* Recent Bookings Table - Matching Wireframe 11 Bottom Table */}
+      {/* Recent Bookings Table */}
       <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-4">
         <div className="flex justify-between items-center border-b border-slate-800 pb-4">
           <div>
             <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-              รายการจองล่าสุด (Recent Bookings)
+              {t.recentBookingsTitle}
             </h3>
-            <p className="text-[11px] text-slate-400">รายการคำขอจองรถที่รอการตรวจสอบอนุมัติ</p>
+            <p className="text-[11px] text-slate-400">{t.recentBookingsSub}</p>
           </div>
 
           <button
             onClick={() => setCurrentView('admin-bookings')}
-            className="text-xs font-semibold text-red-400 hover:text-red-300 flex items-center gap-1"
+            className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1"
           >
-            ดูการจองทั้งหมด <ArrowUpRight className="w-3.5 h-3.5" />
+            {t.viewAllBookingsBtn} <ArrowUpRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -248,21 +248,21 @@ export const AdminDashboard = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold">
               <tr>
-                <th className="p-3 rounded-l-xl">รหัสจอง</th>
-                <th className="p-3">ผู้เช่า</th>
-                <th className="p-3">รถที่เช่า</th>
-                <th className="p-3">วันที่เช่า</th>
-                <th className="p-3">ราคารวม</th>
-                <th className="p-3">สถานะ</th>
-                <th className="p-3 rounded-r-xl text-right">จัดการ</th>
+                <th className="p-3 rounded-l-xl">{t.bookingId}</th>
+                <th className="p-3">{t.tenant}</th>
+                <th className="p-3">{t.rentedCar}</th>
+                <th className="p-3">{t.rentalDates}</th>
+                <th className="p-3">{t.totalPriceLabel}</th>
+                <th className="p-3">{t.status}</th>
+                <th className="p-3 rounded-r-xl text-right">{t.action}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {bookings.slice(0, 5).map((b) => {
-                const badge = getBookingStatusBadge(b.status);
+                const badge = getBookingStatusBadge(b.status, language);
                 return (
                   <tr key={b.booking_id} className="hover:bg-slate-800/40 transition">
-                    <td className="p-3 font-mono font-bold text-red-400">{b.booking_id}</td>
+                    <td className="p-3 font-mono font-bold text-blue-400">{b.booking_id}</td>
                     <td className="p-3">
                       <div className="font-semibold text-white">{b.user_name}</div>
                       <div className="text-[10px] text-slate-400">{b.user_phone}</div>
@@ -272,9 +272,9 @@ export const AdminDashboard = () => {
                       <div className="text-[10px] text-slate-400">{b.car_plate}</div>
                     </td>
                     <td className="p-3">
-                      {b.start_date} ถึง {b.end_date}
+                      {b.start_date} {language === 'en' ? 'to' : 'ถึง'} {b.end_date}
                     </td>
-                    <td className="p-3 font-bold text-white">{formatTHB(b.total_price)}</td>
+                    <td className="p-3 font-bold text-white">{formatTHB(b.total_price, language)}</td>
                     <td className="p-3">
                       <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${badge.bg}`}>
                         {badge.label}
@@ -286,14 +286,14 @@ export const AdminDashboard = () => {
                           onClick={() => updateBookingStatus(b.booking_id, 'ยืนยันแล้ว')}
                           className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px]"
                         >
-                          อนุมัติการจอง
+                          {t.approveBookingBtn}
                         </button>
                       ) : (
                         <button
                           onClick={() => setCurrentView('admin-bookings')}
                           className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px]"
                         >
-                          รายละเอียด
+                          {t.detailsBtn}
                         </button>
                       )}
                     </td>
@@ -308,3 +308,4 @@ export const AdminDashboard = () => {
     </div>
   );
 };
+

@@ -3,10 +3,11 @@ import { useApp } from '../../context/AppContext';
 import { User, Mail, Phone, ShieldCheck, Key, FileCheck, Save } from 'lucide-react';
 
 export const ProfilePage = () => {
-  const { currentUser, showToast } = useApp();
+  const { currentUser, showToast, t, language } = useApp();
+  const isEn = language === 'en';
 
   const [formData, setFormData] = useState({
-    name: currentUser ? currentUser.name : 'นายพงศกร ใจดี',
+    name: currentUser ? currentUser.name : (isEn ? 'Pongsakorn Jaidee' : 'นายพงศกร ใจดี'),
     email: currentUser ? currentUser.email : 'palm@example.com',
     phone: currentUser ? currentUser.phone : '081-234-5678',
     driverLicense: currentUser ? (currentUser.driver_license || 'DL-99182347') : 'DL-99182347',
@@ -21,16 +22,16 @@ export const ProfilePage = () => {
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    showToast('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว!', 'success');
+    showToast(isEn ? 'Personal information saved successfully!' : 'บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว!', 'success');
   };
 
   const handleChangePassword = (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showToast('รหัสผ่านใหม่ไม่ตรงกัน', 'warning');
+      showToast(isEn ? 'New passwords do not match' : 'รหัสผ่านใหม่ไม่ตรงกัน', 'warning');
       return;
     }
-    showToast('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว!', 'success');
+    showToast(isEn ? 'Password changed successfully!' : 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว!', 'success');
     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
 
@@ -39,14 +40,14 @@ export const ProfilePage = () => {
       
       {/* Header */}
       <div className="border-b border-slate-800 pb-6">
-        <div className="flex items-center gap-2 text-xs font-bold text-red-500 uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-wider">
           <User className="w-4 h-4" /> Account Settings
         </div>
         <h1 className="text-3xl font-extrabold text-white font-prompt mt-1">
-          ข้อมูลส่วนตัว / ตั้งค่าบัญชี
+          {t.accountSettings}
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          จัดการข้อมูลการติดต่อ และความปลอดภัยของบัญชีผู้ใช้
+          {t.accountSettingsSub}
         </p>
       </div>
 
@@ -58,9 +59,9 @@ export const ProfilePage = () => {
             <img
               src={currentUser ? currentUser.avatar : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
               alt="Avatar"
-              className="w-28 h-28 rounded-full object-cover border-2 border-red-500 shadow-xl"
+              className="w-28 h-28 rounded-full object-cover border-2 border-blue-500 shadow-xl"
             />
-            <span className="absolute bottom-1 right-1 bg-emerald-500 p-1.5 rounded-full text-slate-950 border-2 border-slate-900" title="ยืนยันตัวตนแล้ว">
+            <span className="absolute bottom-1 right-1 bg-emerald-500 p-1.5 rounded-full text-slate-950 border-2 border-slate-900" title={t.verifiedBadge}>
               <ShieldCheck className="w-4 h-4" />
             </span>
           </div>
@@ -68,21 +69,21 @@ export const ProfilePage = () => {
           <div>
             <h3 className="text-lg font-bold text-white">{formData.name}</h3>
             <p className="text-xs text-slate-400 font-mono mt-0.5">{formData.email}</p>
-            <span className="inline-block mt-2 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/30 text-[10px] font-bold rounded-full uppercase">
+            <span className="inline-block mt-2 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] font-bold rounded-full uppercase">
               {currentUser ? currentUser.role : 'Customer'}
             </span>
           </div>
 
           <div className="border-t border-slate-800 pt-4 text-xs space-y-2 text-left text-slate-300">
             <div className="flex justify-between">
-              <span className="text-slate-500">สถานะเอกสาร:</span>
+              <span className="text-slate-500">{t.docStatus}</span>
               <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <FileCheck className="w-3.5 h-3.5" /> อนุมัติแล้ว
+                <FileCheck className="w-3.5 h-3.5" /> {t.verifiedBadge}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">วันที่สมัคร:</span>
-              <span>10 มกราคม 2025</span>
+              <span className="text-slate-500">{t.regDate}</span>
+              <span>{isEn ? 'January 10, 2025' : '10 มกราคม 2025'}</span>
             </div>
           </div>
         </div>
@@ -93,60 +94,60 @@ export const ProfilePage = () => {
           {/* Profile Details Form */}
           <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3 flex items-center gap-2">
-              <User className="w-4 h-4 text-red-500" /> แก้ไขข้อมูลส่วนตัว
+              <User className="w-4 h-4 text-blue-500" /> {t.editProfileTitle}
             </h3>
 
             <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">ชื่อ-นามสกุล</label>
+                <label className="text-slate-300 font-medium">{t.fullName}</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">อีเมล</label>
+                  <label className="text-slate-300 font-medium">{t.emailLabel}</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">เบอร์โทรศัพท์</label>
+                  <label className="text-slate-300 font-medium">{t.phoneLabel}</label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">เลขประจำตัวประชาชน</label>
+                  <label className="text-slate-300 font-medium">{t.idCardNumber}</label>
                   <input
                     type="text"
                     value={formData.idCard}
                     onChange={(e) => setFormData({ ...formData, idCard: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">ใบขับขี่รถยนต์</label>
+                  <label className="text-slate-300 font-medium">{t.driverLicense}</label>
                   <input
                     type="text"
                     value={formData.driverLicense}
                     onChange={(e) => setFormData({ ...formData, driverLicense: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -154,9 +155,9 @@ export const ProfilePage = () => {
               <div className="pt-2 flex justify-end">
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-950/50"
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-950/50"
                 >
-                  <Save className="w-4 h-4" /> บันทึกข้อมูล
+                  <Save className="w-4 h-4" /> {t.saveInfo}
                 </button>
               </div>
             </form>
@@ -165,41 +166,41 @@ export const ProfilePage = () => {
           {/* Change Password Form */}
           <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Key className="w-4 h-4 text-red-500" /> เปลี่ยนรหัสผ่าน
+              <Key className="w-4 h-4 text-blue-500" /> {t.changePasswordTitle}
             </h3>
 
             <form onSubmit={handleChangePassword} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">รหัสผ่านปัจจุบัน</label>
+                <label className="text-slate-300 font-medium">{t.currentPassword}</label>
                 <input
                   type="password"
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">รหัสผ่านใหม่</label>
+                  <label className="text-slate-300 font-medium">{t.newPassword}</label>
                   <input
                     type="password"
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-medium">ยืนยันรหัสผ่านใหม่</label>
+                  <label className="text-slate-300 font-medium">{t.confirmPassword}</label>
                   <input
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -209,7 +210,7 @@ export const ProfilePage = () => {
                   type="submit"
                   className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold"
                 >
-                  เปลี่ยนรหัสผ่าน
+                  {t.changePasswordBtn}
                 </button>
               </div>
             </form>
@@ -222,3 +223,5 @@ export const ProfilePage = () => {
     </div>
   );
 };
+
+

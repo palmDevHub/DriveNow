@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_USERS, INITIAL_CARS, INITIAL_BOOKINGS, INITIAL_PAYMENTS, ADMIN_ANALYTICS } from '../services/mockData';
+import { translations } from '../utils/translations';
 
 const AppContext = createContext();
 
@@ -12,12 +13,31 @@ export const AppProvider = ({ children }) => {
 
   const [cars, setCars] = useState(() => {
     const saved = localStorage.getItem('drivenow_cars');
-    return saved ? JSON.parse(saved) : INITIAL_CARS;
+    if (saved) {
+      let parsed = JSON.parse(saved);
+      if (parsed.length === 0) return INITIAL_CARS;
+      parsed = parsed.map(c => 
+        c.image === 'https://images.unsplash.com/photo-1541348263662-e082662dc324?auto=format&fit=crop&w=800&q=80'
+        ? { ...c, image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&q=80' }
+        : c
+      );
+      return parsed;
+    }
+    return INITIAL_CARS;
   });
 
   const [bookings, setBookings] = useState(() => {
     const saved = localStorage.getItem('drivenow_bookings');
-    return saved ? JSON.parse(saved) : INITIAL_BOOKINGS;
+    if (saved) {
+      let parsed = JSON.parse(saved);
+      parsed = parsed.map(b => 
+        b.car_image === 'https://images.unsplash.com/photo-1541348263662-e082662dc324?auto=format&fit=crop&w=800&q=80'
+        ? { ...b, car_image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&q=80' }
+        : b
+      );
+      return parsed;
+    }
+    return INITIAL_BOOKINGS;
   });
 
   const [payments, setPayments] = useState(() => {
@@ -25,14 +45,72 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : INITIAL_PAYMENTS;
   });
 
-  // Logged in user state (default: palm@example.com - customer)
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('drivenow_current_user');
-    return saved ? JSON.parse(saved) : INITIAL_USERS[0];
+  const [chats, setChats] = useState(() => {
+    const saved = localStorage.getItem('drivenow_chats');
+    return saved ? JSON.parse(saved) : {};
   });
 
-  // Navigation state
-  const [currentView, setCurrentView] = useState('home'); // 'home', 'cars', 'car-detail', 'checkout', 'my-bookings', 'profile', 'admin-dashboard', 'admin-cars', 'admin-bookings', 'admin-users', 'login', 'register'
+  // Language state ('th' | 'en')
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('drivenow_lang') || 'th';
+  });
+
+  // Theme state ('dark' | 'light')
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('drivenow_theme') || 'dark';
+  });
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('drivenow_current_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Navigation state - Always initialize customer section to 'home' on browser refresh
+  const [currentView, setCurrentView] = useState(() => {
+    const savedUser = localStorage.getItem('drivenow_current_user');
+    if (savedUser) {
+      try {
+        const userObj = JSON.parse(savedUser);
+        if (userObj && userObj.role === 'admin') {
+          return 'admin-dashboard';
+        }
+      } catch (e) {}
+    }
+    return 'home';
+  });
+
+  // Reset view to 'home' for customer section whenever page is reloaded / refreshed
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setCurrentView('home');
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
+  // Language & Theme Persistence & DOM Effects
+  useEffect(() => {
+    localStorage.setItem('drivenow_lang', language);
+  }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('drivenow_theme', theme);
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+  }, [theme]);
+
+  const toggleLanguage = () => {
+    setLanguage(prev => (prev === 'th' ? 'en' : 'th'));
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  const t = translations[language] || translations['th'];
+
   const [selectedCar, setSelectedCar] = useState(null);
   const [bookingDraft, setBookingDraft] = useState({
     car: null,
@@ -71,6 +149,10 @@ export const AppProvider = ({ children }) => {
   }, [payments]);
 
   useEffect(() => {
+    localStorage.setItem('drivenow_chats', JSON.stringify(chats));
+  }, [chats]);
+
+  useEffect(() => {
     if (currentUser) {
       localStorage.setItem('drivenow_current_user', JSON.stringify(currentUser));
     } else {
@@ -104,6 +186,26 @@ export const AppProvider = ({ children }) => {
       }
     }
     return { success: false, message: 'ไม่พบบัญชีผู้ใช้นี้ในระบบ' };
+  };
+
+  const loginWithGoogle = () => {
+    let googleUser = users.find(u => u.email === 'google@gmail.com');
+    if (!googleUser) {
+      googleUser = {
+        user_id: `USR-00${users.length + 1}`,
+        name: 'Google User',
+        email: 'google@gmail.com',
+        password: '',
+        phone: '089-999-9999',
+        role: 'customer',
+        avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=300&q=80',
+        created_at: new Date().toISOString().split('T')[0]
+      };
+      setUsers(prev => [...prev, googleUser]);
+    }
+    setCurrentUser(googleUser);
+    showToast('เข้าสู่ระบบด้วย Google สำเร็จ!', 'success');
+    setCurrentView('home');
   };
 
   const register = (userData) => {
@@ -250,6 +352,29 @@ export const AppProvider = ({ children }) => {
     setCurrentView('car-detail');
   };
 
+  const submitReview = (bookingId, rating, comment) => {
+    setBookings(prev => prev.map(b => 
+      b.booking_id === bookingId 
+        ? { ...b, has_reviewed: true, rating, review_comment: comment }
+        : b
+    ));
+    showToast('ขอบคุณสำหรับคำติชมและคะแนนของคุณครับ!', 'success');
+  };
+
+  const sendChatMessage = (userId, userName, text, sender) => {
+    setChats(prev => {
+      const userChat = prev[userId] || { userName, messages: [] };
+      return {
+        ...prev,
+        [userId]: {
+          ...userChat,
+          userName: userName || userChat.userName,
+          messages: [...userChat.messages, { id: Date.now(), text, sender, timestamp: Date.now() }]
+        }
+      };
+    });
+  };
+
   return (
     <AppContext.Provider value={{
       users,
@@ -262,12 +387,20 @@ export const AppProvider = ({ children }) => {
       bookingDraft,
       searchFilter,
       toast,
+      language,
+      theme,
+      t,
       ADMIN_ANALYTICS,
       setCurrentView,
       setSelectedCar,
       setBookingDraft,
       setSearchFilter,
+      setLanguage,
+      setTheme,
+      toggleLanguage,
+      toggleTheme,
       login,
+      loginWithGoogle,
       register,
       logout,
       switchDemoRole,
@@ -279,6 +412,9 @@ export const AppProvider = ({ children }) => {
       updateBookingStatus,
       cancelBooking,
       handleSelectCarForBooking,
+      submitReview,
+      sendChatMessage,
+      chats,
       showToast
     }}>
       {children}

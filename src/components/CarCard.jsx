@@ -4,8 +4,8 @@ import { formatTHB, getCarStatusBadge } from '../utils/formatters';
 import { Users, Fuel, Gauge, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
 
 export const CarCard = ({ car }) => {
-  const { handleSelectCarForBooking } = useApp();
-  const statusInfo = getCarStatusBadge(car.status);
+  const { handleSelectCarForBooking, language, t, theme } = useApp();
+  const statusInfo = getCarStatusBadge(car.status, language);
   const isAvailable = car.status === 'ว่าง' || car.status === 'available';
 
   return (
@@ -36,11 +36,11 @@ export const CarCard = ({ car }) => {
       {/* Car Info Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div>
-          <div className="flex items-center gap-1.5 text-xs text-red-500 font-semibold mb-1">
+          <div className="flex items-center gap-1.5 text-xs text-blue-500 font-semibold mb-1">
             <Tag className="w-3.5 h-3.5" />
             <span>{car.brand}</span>
           </div>
-          <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition line-clamp-1">
+          <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition line-clamp-1">
             {car.model}
           </h3>
           <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
@@ -49,30 +49,30 @@ export const CarCard = ({ car }) => {
         </div>
 
         {/* Vehicle Specs Grid */}
-        <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-800/80 text-xs text-slate-300">
-          <div className="flex items-center gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-slate-800/50">
-            <Users className="w-4 h-4 text-slate-400 shrink-0" />
-            <span>{car.seats} ที่นั่ง</span>
+        <div className={`grid grid-cols-3 gap-2 py-3 border-y border-slate-800/80 text-xs ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
+          <div className={`flex items-center gap-1.5 p-2 rounded-xl border ${theme === 'light' ? 'bg-slate-100 border-slate-200' : 'bg-slate-950/60 border-slate-800/50'}`}>
+            <Users className={`w-4 h-4 shrink-0 ${theme === 'light' ? 'text-blue-500' : 'text-slate-400'}`} />
+            <span className="font-semibold">{car.seats} {t.seats}</span>
           </div>
-          <div className="flex items-center gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-slate-800/50 truncate">
-            <Gauge className="w-4 h-4 text-slate-400 shrink-0" />
-            <span className="truncate">{car.transmission}</span>
+          <div className={`flex items-center gap-1.5 p-2 rounded-xl border truncate ${theme === 'light' ? 'bg-slate-100 border-slate-200' : 'bg-slate-950/60 border-slate-800/50'}`}>
+            <Gauge className={`w-4 h-4 shrink-0 ${theme === 'light' ? 'text-blue-500' : 'text-slate-400'}`} />
+            <span className="truncate font-semibold">{car.transmission}</span>
           </div>
-          <div className="flex items-center gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-slate-800/50 truncate">
-            <Fuel className="w-4 h-4 text-slate-400 shrink-0" />
-            <span className="truncate">{car.fuel}</span>
+          <div className={`flex items-center gap-1.5 p-2 rounded-xl border truncate ${theme === 'light' ? 'bg-slate-100 border-slate-200' : 'bg-slate-950/60 border-slate-800/50'}`}>
+            <Fuel className={`w-4 h-4 shrink-0 ${theme === 'light' ? 'text-blue-500' : 'text-slate-400'}`} />
+            <span className="truncate font-semibold">{car.fuel}</span>
           </div>
         </div>
 
         {/* Pricing & Booking CTA */}
         <div className="flex items-center justify-between pt-1">
           <div>
-            <span className="text-xs text-slate-400">ราคาเช่าเริ่มต้น</span>
+            <span className="text-xs text-slate-400">{t.pricePerDay}</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-extrabold text-red-500 font-prompt">
+              <span className="text-xl font-extrabold text-blue-500 font-prompt">
                 {formatTHB(car.price_per_day)}
               </span>
-              <span className="text-xs text-slate-400">/วัน</span>
+              <span className="text-xs text-slate-400">{t.perDay}</span>
             </div>
           </div>
 
@@ -80,11 +80,11 @@ export const CarCard = ({ car }) => {
             onClick={() => handleSelectCarForBooking(car)}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md ${
               isAvailable
-                ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-950/50 hover:gap-2'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white keep-white shadow-blue-950/50 hover:gap-2'
                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
             }`}
           >
-            <span>{isAvailable ? 'รายละเอียด / จองรถ' : 'ดูรายละเอียด'}</span>
+            <span>{isAvailable ? t.detailsAndBook : t.viewDetails}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -94,3 +94,4 @@ export const CarCard = ({ car }) => {
     </div>
   );
 };
+

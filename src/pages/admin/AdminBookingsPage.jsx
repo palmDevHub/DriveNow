@@ -4,13 +4,14 @@ import { formatTHB, formatThaiDate, getBookingStatusBadge } from '../../utils/fo
 import { Calendar, Eye, CheckCircle, Clock, XCircle, Search, FileText } from 'lucide-react';
 
 export const AdminBookingsPage = () => {
-  const { bookings, updateBookingStatus } = useApp();
+  const { bookings, updateBookingStatus, t, language } = useApp();
+  const isEn = language === 'en';
   const [statusFilter, setStatusFilter] = useState('ทั้งหมด');
   const [keyword, setKeyword] = useState('');
   const [viewSlipModal, setViewSlipModal] = useState(null);
 
   const filteredBookings = bookings.filter(b => {
-    if (statusFilter !== 'ทั้งหมด' && b.status !== statusFilter) return false;
+    if (statusFilter !== 'ทั้งหมด' && statusFilter !== 'All' && b.status !== statusFilter) return false;
     if (keyword) {
       const kw = keyword.toLowerCase();
       return (
@@ -26,16 +27,16 @@ export const AdminBookingsPage = () => {
   return (
     <div className="space-y-8 pb-12">
       
-      {/* Header Bar - Matching Wireframe 13 */}
+      {/* Header Bar */}
       <div className="border-b border-slate-800 pb-6">
-        <div className="flex items-center gap-2 text-xs font-bold text-red-500 uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-wider">
           <Calendar className="w-4 h-4" /> Rental Bookings Manager
         </div>
         <h1 className="text-3xl font-extrabold text-white font-prompt mt-1">
-          จัดการรายการจองรถ (Manage Bookings)
+          {isEn ? 'Manage Customer Bookings' : 'จัดการรายการจองรถ (Manage Bookings)'}
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          ตรวจสอบสลิปการโอนเงิน อนุมัติการจอง เปลี่ยนสถานะการคืนรถ และยกเลิกคำขอ
+          {isEn ? 'Review payment slips, approve bookings, update rental statuses, and manage cancellations.' : 'ตรวจสอบสลิปการโอนเงิน อนุมัติการจอง เปลี่ยนสถานะการคืนรถ และยกเลิกคำขอ'}
         </p>
       </div>
 
@@ -49,24 +50,31 @@ export const AdminBookingsPage = () => {
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="ค้นหาตามรหัสจอง ชื่อผู้เช่า เบอร์โทร หรือ รุ่นรถ..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 text-xs text-white rounded-xl focus:border-red-500 focus:outline-none"
+            placeholder={isEn ? 'Search by ID, name, phone or car model...' : 'ค้นหาตามรหัสจอง ชื่อผู้เช่า เบอร์โทร หรือ รุ่นรถ...'}
+            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 text-xs text-white rounded-xl focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Status Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-          {['ทั้งหมด', 'รอยืนยัน', 'ยืนยันแล้ว', 'กำลังใช้งาน', 'คืนรถแล้ว', 'ยกเลิก'].map((st) => (
+          {[
+            { id: 'ทั้งหมด', label: isEn ? 'All' : 'ทั้งหมด' },
+            { id: 'รอยืนยัน', label: isEn ? 'Pending' : 'รอยืนยัน' },
+            { id: 'ยืนยันแล้ว', label: isEn ? 'Approved' : 'ยืนยันแล้ว' },
+            { id: 'กำลังใช้งาน', label: isEn ? 'In Use' : 'กำลังใช้งาน' },
+            { id: 'คืนรถแล้ว', label: isEn ? 'Returned' : 'คืนรถแล้ว' },
+            { id: 'ยกเลิก', label: isEn ? 'Cancelled' : 'ยกเลิก' }
+          ].map((st) => (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
+              key={st.id}
+              onClick={() => setStatusFilter(st.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition ${
-                statusFilter === st
-                  ? 'bg-red-600 text-white font-bold'
+                statusFilter === st.id
+                  ? 'bg-blue-600 text-white font-bold'
                   : 'bg-slate-950 text-slate-400 border border-slate-800'
               }`}
             >
-              {st}
+              {st.label}
             </button>
           ))}
         </div>
@@ -79,22 +87,22 @@ export const AdminBookingsPage = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800">
               <tr>
-                <th className="p-4">รหัสจอง</th>
-                <th className="p-4">ผู้เช่ารถ</th>
-                <th className="p-4">รถที่จอง</th>
-                <th className="p-4">ระยะเวลาเช่า</th>
-                <th className="p-4">ยอดชำระ</th>
-                <th className="p-4">สลิป</th>
-                <th className="p-4">สถานะการจอง</th>
-                <th className="p-4 text-right">ดำเนินการ</th>
+                <th className="p-4">{t.bookingId}</th>
+                <th className="p-4">{t.tenant}</th>
+                <th className="p-4">{t.rentedCar}</th>
+                <th className="p-4">{t.rentalDates}</th>
+                <th className="p-4">{t.totalPriceLabel}</th>
+                <th className="p-4">{isEn ? 'Slip' : 'สลิป'}</th>
+                <th className="p-4">{t.status}</th>
+                <th className="p-4 text-right">{t.action}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {filteredBookings.map((b) => {
-                const badge = getBookingStatusBadge(b.status);
+                const badge = getBookingStatusBadge(b.status, language);
                 return (
                   <tr key={b.booking_id} className="hover:bg-slate-800/40 transition">
-                    <td className="p-4 font-mono font-bold text-red-400">{b.booking_id}</td>
+                    <td className="p-4 font-mono font-bold text-blue-400">{b.booking_id}</td>
                     <td className="p-4">
                       <div className="font-bold text-white">{b.user_name}</div>
                       <div className="text-[10px] text-slate-400">{b.user_email} • {b.user_phone}</div>
@@ -104,11 +112,11 @@ export const AdminBookingsPage = () => {
                       <div className="text-[10px] text-slate-400">{b.car_plate}</div>
                     </td>
                     <td className="p-4">
-                      <div>{formatThaiDate(b.start_date)} - {formatThaiDate(b.end_date)}</div>
-                      <div className="text-[10px] text-slate-400 font-bold">{b.total_days} วัน</div>
+                      <div>{formatThaiDate(b.start_date, language)} - {formatThaiDate(b.end_date, language)}</div>
+                      <div className="text-[10px] text-slate-400 font-bold">{b.total_days} {t.days}</div>
                     </td>
-                    <td className="p-4 font-extrabold text-red-500 font-prompt text-sm">
-                      {formatTHB(b.total_price)}
+                    <td className="p-4 font-extrabold text-blue-500 font-prompt text-sm">
+                      {formatTHB(b.total_price, language)}
                     </td>
                     <td className="p-4">
                       {b.payment_slip ? (
@@ -116,7 +124,7 @@ export const AdminBookingsPage = () => {
                           onClick={() => setViewSlipModal(b)}
                           className="px-2.5 py-1 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-lg text-[10px] flex items-center gap-1"
                         >
-                          <Eye className="w-3.5 h-3.5 text-blue-400" /> ดูสลิป
+                          <Eye className="w-3.5 h-3.5 text-blue-400" /> {isEn ? 'View Slip' : 'ดูสลิป'}
                         </button>
                       ) : (
                         <span className="text-slate-500 text-[10px]">-</span>
@@ -131,14 +139,14 @@ export const AdminBookingsPage = () => {
                       <select
                         value={b.status}
                         onChange={(e) => updateBookingStatus(b.booking_id, e.target.value)}
-                        className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-white rounded-lg text-xs focus:border-red-500 focus:outline-none cursor-pointer font-medium"
+                        className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-white rounded-lg text-xs focus:border-blue-500 focus:outline-none cursor-pointer font-medium"
                       >
-                        <option value="รอชำระเงิน">รอชำระเงิน</option>
-                        <option value="รอยืนยัน">รอยืนยันสลิป</option>
-                        <option value="ยืนยันแล้ว">อนุมัติ (ยืนยันแล้ว)</option>
-                        <option value="กำลังใช้งาน">กำลังใช้งานรถ</option>
-                        <option value="คืนรถแล้ว">คืนรถเรียบร้อยแล้ว</option>
-                        <option value="ยกเลิก">ยกเลิกการจอง</option>
+                        <option value="รอชำระเงิน">{isEn ? 'Pending Payment' : 'รอชำระเงิน'}</option>
+                        <option value="รอยืนยัน">{isEn ? 'Pending Slip Verification' : 'รอยืนยันสลิป'}</option>
+                        <option value="ยืนยันแล้ว">{isEn ? 'Approved' : 'อนุมัติ (ยืนยันแล้ว)'}</option>
+                        <option value="กำลังใช้งาน">{isEn ? 'In Use' : 'กำลังใช้งานรถ'}</option>
+                        <option value="คืนรถแล้ว">{isEn ? 'Returned' : 'คืนรถเรียบร้อยแล้ว'}</option>
+                        <option value="ยกเลิก">{isEn ? 'Cancelled' : 'ยกเลิกการจอง'}</option>
                       </select>
                     </td>
                   </tr>
@@ -154,14 +162,14 @@ export const AdminBookingsPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl relative animate-slide-down">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white">หลักฐานสลิปการโอนเงิน</h3>
+              <h3 className="text-base font-bold text-white">{isEn ? 'Payment Slip Proof' : 'หลักฐานสลิปการโอนเงิน'}</h3>
               <button onClick={() => setViewSlipModal(null)} className="text-slate-400 hover:text-white">✕</button>
             </div>
 
             <div className="space-y-2 text-xs">
-              <p className="text-slate-300">รหัสจอง: <strong className="text-red-400 font-mono">{viewSlipModal.booking_id}</strong></p>
-              <p className="text-slate-300">ผู้โอน: {viewSlipModal.user_name} ({viewSlipModal.user_phone})</p>
-              <p className="text-slate-300">ยอดเงิน: <strong className="text-red-500 text-sm font-bold">{formatTHB(viewSlipModal.total_price)}</strong></p>
+              <p className="text-slate-300">{t.bookingId}: <strong className="text-blue-400 font-mono">{viewSlipModal.booking_id}</strong></p>
+              <p className="text-slate-300">{t.tenant}: {viewSlipModal.user_name} ({viewSlipModal.user_phone})</p>
+              <p className="text-slate-300">{t.totalPriceLabel}: <strong className="text-blue-500 text-sm font-bold">{formatTHB(viewSlipModal.total_price, language)}</strong></p>
             </div>
 
             <img
@@ -178,7 +186,7 @@ export const AdminBookingsPage = () => {
                 }}
                 className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-950/40"
               >
-                <CheckCircle className="w-4 h-4" /> อนุมัติการจองสลิปนี้
+                <CheckCircle className="w-4 h-4" /> {isEn ? 'Approve Payment Slip' : 'อนุมัติการจองสลิปนี้'}
               </button>
             </div>
           </div>
@@ -188,3 +196,4 @@ export const AdminBookingsPage = () => {
     </div>
   );
 };
+

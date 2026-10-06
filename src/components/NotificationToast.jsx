@@ -17,14 +17,15 @@ export const NotificationToast = () => {
           ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' 
           : isWarning 
           ? 'bg-amber-950/90 border-amber-500/40 text-amber-200' 
-          : 'bg-slate-900/90 border-red-500/40 text-slate-100'
+          : 'bg-slate-900/90 border-blue-500/40 text-slate-100'
       }`}>
         {isSuccess && <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />}
         {isWarning && <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />}
-        {!isSuccess && !isWarning && <Info className="w-5 h-5 text-red-400 shrink-0" />}
+        {!isSuccess && !isWarning && <Info className="w-5 h-5 text-blue-400 shrink-0" />}
         
         <p className="text-sm font-medium">{toast.message}</p>
       </div>
     </div>
   );
 };
+

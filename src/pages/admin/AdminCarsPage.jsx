@@ -4,7 +4,8 @@ import { formatTHB, getCarStatusBadge } from '../../utils/formatters';
 import { Car, Plus, Edit, Trash2, Search, X, Check, SlidersHorizontal, AlertCircle } from 'lucide-react';
 
 export const AdminCarsPage = () => {
-  const { cars, addCar, updateCar, deleteCar, toggleCarStatus } = useApp();
+  const { cars, addCar, updateCar, deleteCar, toggleCarStatus, t, language } = useApp();
+  const isEn = language === 'en';
 
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('ทั้งหมด');
@@ -29,7 +30,7 @@ export const AdminCarsPage = () => {
   });
 
   const filteredCars = cars.filter(c => {
-    if (statusFilter !== 'ทั้งหมด' && c.status !== statusFilter) return false;
+    if (statusFilter !== 'ทั้งหมด' && statusFilter !== 'All' && c.status !== statusFilter) return false;
     if (keyword) {
       const kw = keyword.toLowerCase();
       return (
@@ -55,7 +56,7 @@ export const AdminCarsPage = () => {
       year: 2024,
       plate_number: '1กข 9988 กรุงเทพฯ',
       image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
-      description: 'รถสภาพดีเยี่ยม ตรวจเช็คระยะเรียบร้อย พร้อมใช้งานทันที'
+      description: isEn ? 'Excellent condition vehicle, serviced and ready for instant drive.' : 'รถสภาพดีเยี่ยม ตรวจเช็คระยะเรียบร้อย พร้อมใช้งานทันที'
     });
     setIsModalOpen(true);
   };
@@ -79,25 +80,25 @@ export const AdminCarsPage = () => {
   return (
     <div className="space-y-8 pb-12">
       
-      {/* Header Bar - Matching Wireframe 12 */}
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-red-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-wider">
             <Car className="w-4 h-4" /> Vehicle Inventory
           </div>
           <h1 className="text-3xl font-extrabold text-white font-prompt mt-1">
-            จัดการข้อมูลรถเช่า (Manage Cars - CRUD)
+            {isEn ? 'Manage Fleet Cars' : 'จัดการข้อมูลรถเช่า (Manage Cars - CRUD)'}
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            เพิ่ม แก้ไข ลบข้อมูลรถ และปรับเปลี่ยนสถานะรถว่าง/ถูกจอง/ซ่อม
+            {isEn ? 'Add, edit, remove vehicles and toggle availability statuses.' : 'เพิ่ม แก้ไข ลบข้อมูลรถ และปรับเปลี่ยนสถานะรถว่าง/ถูกจอง/ซ่อม'}
           </p>
         </div>
 
         <button
           onClick={handleOpenAddModal}
-          className="px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-red-950/50"
+          className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-950/50"
         >
-          <Plus className="w-4 h-4" /> เพิ่มข้อมูลรถคันใหม่
+          <Plus className="w-4 h-4" /> {isEn ? '+ Add New Vehicle' : 'เพิ่มข้อมูลรถคันใหม่'}
         </button>
       </div>
 
@@ -111,25 +112,31 @@ export const AdminCarsPage = () => {
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="ค้นหาตามยี่ห้อ รุ่น หรือ ทะเบียน..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 text-xs text-white rounded-xl focus:border-red-500 focus:outline-none"
+            placeholder={isEn ? 'Search brand, model or plate...' : 'ค้นหาตามยี่ห้อ รุ่น หรือ ทะเบียน...'}
+            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 text-xs text-white rounded-xl focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Status Pills */}
         <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-          <span className="text-xs text-slate-400 shrink-0">สถานะ:</span>
-          {['ทั้งหมด', 'ว่าง', 'ถูกจอง', 'กำลังเช่า', 'ซ่อม'].map((st) => (
+          <span className="text-xs text-slate-400 shrink-0">{t.status}:</span>
+          {[
+            { id: 'ทั้งหมด', label: isEn ? 'All' : 'ทั้งหมด' },
+            { id: 'ว่าง', label: isEn ? 'Available' : 'ว่าง' },
+            { id: 'ถูกจอง', label: isEn ? 'Reserved' : 'ถูกจอง' },
+            { id: 'กำลังเช่า', label: isEn ? 'Rented' : 'กำลังเช่า' },
+            { id: 'ซ่อม', label: isEn ? 'Maintenance' : 'ซ่อม' }
+          ].map((st) => (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
+              key={st.id}
+              onClick={() => setStatusFilter(st.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition ${
-                statusFilter === st
-                  ? 'bg-red-600 text-white font-bold'
+                statusFilter === st.id
+                  ? 'bg-blue-600 text-white font-bold'
                   : 'bg-slate-950 text-slate-400 border border-slate-800'
               }`}
             >
-              {st}
+              {st.label}
             </button>
           ))}
         </div>
@@ -142,18 +149,18 @@ export const AdminCarsPage = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800">
               <tr>
-                <th className="p-4">รูปภาพ</th>
-                <th className="p-4">รหัสรถ</th>
-                <th className="p-4">ยี่ห้อ/รุ่น</th>
-                <th className="p-4">ประเภท/เกียร์</th>
-                <th className="p-4">ราคา/วัน</th>
-                <th className="p-4">สถานะการใช้งาน</th>
-                <th className="p-4 text-right">จัดการข้อมูล</th>
+                <th className="p-4">{isEn ? 'Photo' : 'รูปภาพ'}</th>
+                <th className="p-4">{isEn ? 'Car ID' : 'รหัสรถ'}</th>
+                <th className="p-4">{isEn ? 'Brand / Model' : 'ยี่ห้อ/รุ่น'}</th>
+                <th className="p-4">{isEn ? 'Type / Gear' : 'ประเภท/เกียร์'}</th>
+                <th className="p-4">{isEn ? 'Rate / Day' : 'ราคา/วัน'}</th>
+                <th className="p-4">{isEn ? 'Status' : 'สถานะการใช้งาน'}</th>
+                <th className="p-4 text-right">{t.action}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {filteredCars.map((car) => {
-                const badge = getCarStatusBadge(car.status);
+                const badge = getCarStatusBadge(car.status, language);
                 return (
                   <tr key={car.car_id} className="hover:bg-slate-800/40 transition">
                     <td className="p-4">
@@ -163,17 +170,17 @@ export const AdminCarsPage = () => {
                         className="w-16 h-12 object-cover rounded-xl border border-slate-800"
                       />
                     </td>
-                    <td className="p-4 font-mono font-bold text-red-400">{car.car_id}</td>
+                    <td className="p-4 font-mono font-bold text-blue-400">{car.car_id}</td>
                     <td className="p-4">
                       <div className="font-bold text-white text-sm">{car.brand} {car.model}</div>
-                      <div className="text-[10px] text-slate-400">ทะเบียน: {car.plate_number || '-'}</div>
+                      <div className="text-[10px] text-slate-400">{isEn ? 'Plate:' : 'ทะเบียน:'} {car.plate_number || '-'}</div>
                     </td>
                     <td className="p-4">
                       <div className="text-white font-medium">{car.type}</div>
                       <div className="text-[10px] text-slate-400">{car.transmission} • {car.fuel}</div>
                     </td>
-                    <td className="p-4 font-extrabold text-red-500 font-prompt text-sm">
-                      {formatTHB(car.price_per_day)}
+                    <td className="p-4 font-extrabold text-blue-500 font-prompt text-sm">
+                      {formatTHB(car.price_per_day, language)}
                     </td>
                     <td className="p-4">
                       <select
@@ -181,10 +188,10 @@ export const AdminCarsPage = () => {
                         onChange={(e) => toggleCarStatus(car.car_id, e.target.value)}
                         className={`px-3 py-1 text-xs font-bold rounded-full border bg-slate-950 focus:outline-none cursor-pointer ${badge.color} ${badge.border}`}
                       >
-                        <option value="ว่าง">ว่าง (Available)</option>
-                        <option value="ถูกจอง">ถูกจอง (Reserved)</option>
-                        <option value="กำลังเช่า">กำลังเช่า (Rented)</option>
-                        <option value="ซ่อม">ซ่อม (Maintenance)</option>
+                        <option value="ว่าง">{isEn ? 'Available' : 'ว่าง (Available)'}</option>
+                        <option value="ถูกจอง">{isEn ? 'Reserved' : 'ถูกจอง (Reserved)'}</option>
+                        <option value="กำลังเช่า">{isEn ? 'Rented' : 'กำลังเช่า (Rented)'}</option>
+                        <option value="ซ่อม">{isEn ? 'Maintenance' : 'ซ่อม (Maintenance)'}</option>
                       </select>
                     </td>
                     <td className="p-4 text-right">
@@ -192,18 +199,21 @@ export const AdminCarsPage = () => {
                         <button
                           onClick={() => handleOpenEditModal(car)}
                           className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl"
-                          title="แก้ไขข้อมูล"
+                          title={isEn ? 'Edit Car' : 'แก้ไขข้อมูล'}
                         >
                           <Edit className="w-4 h-4 text-blue-400" />
                         </button>
                         <button
                           onClick={() => {
-                            if (window.confirm(`คุณต้องการลบข้อมูลรถ ${car.brand} ${car.model} ใช่หรือไม่?`)) {
+                            const confirmMsg = isEn 
+                              ? `Are you sure you want to delete ${car.brand} ${car.model}?`
+                              : `คุณต้องการลบข้อมูลรถ ${car.brand} ${car.model} ใช่หรือไม่?`;
+                            if (window.confirm(confirmMsg)) {
                               deleteCar(car.car_id);
                             }
                           }}
                           className="p-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-400 rounded-xl"
-                          title="ลบรถคันนี้"
+                          title={isEn ? 'Delete Car' : 'ลบรถคันนี้'}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -224,7 +234,7 @@ export const AdminCarsPage = () => {
             
             <div className="flex justify-between items-center border-b border-slate-800 pb-4">
               <h3 className="text-lg font-bold text-white font-prompt flex items-center gap-2">
-                <Car className="w-5 h-5 text-red-500" />
+                <Car className="w-5 h-5 text-blue-500" />
                 {editingCar ? `แก้ไขข้อมูลรถ (${editingCar.car_id})` : 'เพิ่มข้อมูลรถคันใหม่'}
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
@@ -242,7 +252,7 @@ export const AdminCarsPage = () => {
                     value={formState.brand}
                     onChange={(e) => setFormState({ ...formState, brand: e.target.value })}
                     placeholder="เช่น Toyota, Honda, MG"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -254,7 +264,7 @@ export const AdminCarsPage = () => {
                     value={formState.model}
                     onChange={(e) => setFormState({ ...formState, model: e.target.value })}
                     placeholder="เช่น Camry 2.5 HV, Civic RS"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -265,7 +275,7 @@ export const AdminCarsPage = () => {
                   <select
                     value={formState.type}
                     onChange={(e) => setFormState({ ...formState, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   >
                     <option value="Sedan">Sedan</option>
                     <option value="SUV">SUV</option>
@@ -282,7 +292,7 @@ export const AdminCarsPage = () => {
                     required
                     value={formState.price_per_day}
                     onChange={(e) => setFormState({ ...formState, price_per_day: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -291,7 +301,7 @@ export const AdminCarsPage = () => {
                   <select
                     value={formState.status}
                     onChange={(e) => setFormState({ ...formState, status: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   >
                     <option value="ว่าง">ว่าง</option>
                     <option value="ถูกจอง">ถูกจอง</option>
@@ -308,7 +318,7 @@ export const AdminCarsPage = () => {
                     type="number"
                     value={formState.seats}
                     onChange={(e) => setFormState({ ...formState, seats: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -319,7 +329,7 @@ export const AdminCarsPage = () => {
                     value={formState.transmission}
                     onChange={(e) => setFormState({ ...formState, transmission: e.target.value })}
                     placeholder="ออโต้ / ธรรมดา"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -330,7 +340,7 @@ export const AdminCarsPage = () => {
                     value={formState.fuel}
                     onChange={(e) => setFormState({ ...formState, fuel: e.target.value })}
                     placeholder="เบนซิน / ดีเซล / ไฮบริด / ไฟฟ้า 100%"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -343,7 +353,7 @@ export const AdminCarsPage = () => {
                   value={formState.image}
                   onChange={(e) => setFormState({ ...formState, image: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -354,7 +364,7 @@ export const AdminCarsPage = () => {
                   value={formState.description}
                   onChange={(e) => setFormState({ ...formState, description: e.target.value })}
                   placeholder="คำอธิบายเกี่ยวกับรถ สมรรถนะ และความพร้อมใช้งาน"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-blue-500 focus:outline-none"
                 ></textarea>
               </div>
 
@@ -368,7 +378,7 @@ export const AdminCarsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-950/50"
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-950/50"
                 >
                   {editingCar ? 'บันทึกการแก้ไข' : 'เพิ่มรถใหม่'}
                 </button>
@@ -382,3 +392,4 @@ export const AdminCarsPage = () => {
     </div>
   );
 };
+

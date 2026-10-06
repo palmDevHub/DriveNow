@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { NotificationToast } from './components/NotificationToast';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
+import { ChatWidget } from './components/ChatWidget';
 
 // Customer Pages
 import { HomePage } from './pages/customer/HomePage';
@@ -21,45 +23,52 @@ import { AdminBookingsPage } from './pages/admin/AdminBookingsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 
 const MainContent = () => {
-  const { currentView } = useApp();
+  const { currentView, currentUser } = useApp();
+
+  // Scroll to top whenever current view changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentView]);
 
   const renderView = () => {
+    const isGuest = !currentUser;
+    const isAdmin = currentUser?.role === 'admin';
+
+    // Admin Protected Routes
+    if (currentView.startsWith('admin-')) {
+      if (isGuest) return <LoginPage />;
+      if (!isAdmin) return <HomePage />; // Unauthorized customer trying to access admin
+    }
+
+    // Customer Protected Routes
+    const customerProtected = ['checkout', 'my-bookings', 'profile'];
+    if (customerProtected.includes(currentView)) {
+      if (isGuest) return <LoginPage />;
+    }
+
     switch (currentView) {
       // Customer Portal
-      case 'home':
-        return <HomePage />;
-      case 'cars':
-        return <CarsPage />;
-      case 'car-detail':
-        return <CarDetailPage />;
-      case 'checkout':
-        return <CheckoutPage />;
-      case 'my-bookings':
-        return <MyBookingsPage />;
-      case 'profile':
-        return <ProfilePage />;
-      case 'login':
-        return <LoginPage />;
-      case 'register':
-        return <RegisterPage />;
+      case 'home': return <HomePage />;
+      case 'cars': return <CarsPage />;
+      case 'car-detail': return <CarDetailPage />;
+      case 'checkout': return <CheckoutPage />;
+      case 'my-bookings': return <MyBookingsPage />;
+      case 'profile': return <ProfilePage />;
+      case 'login': return <LoginPage />;
+      case 'register': return <RegisterPage />;
 
       // Admin Portal
-      case 'admin-dashboard':
-        return <AdminDashboard />;
-      case 'admin-cars':
-        return <AdminCarsPage />;
-      case 'admin-bookings':
-        return <AdminBookingsPage />;
-      case 'admin-users':
-        return <AdminUsersPage />;
+      case 'admin-dashboard': return <AdminDashboard />;
+      case 'admin-cars': return <AdminCarsPage />;
+      case 'admin-bookings': return <AdminBookingsPage />;
+      case 'admin-users': return <AdminUsersPage />;
 
-      default:
-        return <HomePage />;
+      default: return <HomePage />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-kanit flex flex-col justify-between selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-kanit flex flex-col justify-between selection:bg-blue-500 selection:text-white">
       <Navbar />
       <NotificationToast />
 
@@ -68,6 +77,8 @@ const MainContent = () => {
       </main>
 
       <Footer />
+      <ScrollToTopButton />
+      <ChatWidget />
     </div>
   );
 };
@@ -79,3 +90,4 @@ export default function App() {
     </AppProvider>
   );
 }
+

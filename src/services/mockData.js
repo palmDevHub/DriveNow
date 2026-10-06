@@ -93,7 +93,7 @@ export const INITIAL_CARS = [
     fuel: 'ไฟฟ้า 100%',
     year: 2023,
     plate_number: '8กน 3310 ชลบุรี',
-    image: 'https://images.unsplash.com/photo-1541348263662-e082662dc324?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&q=80',
     description: 'สมาร์ท SUV ไฟฟ้า 100% ขับได้ไกล เงียบ ประหยัด ค่าชาร์จถูก พร้อมระบบหลังคาซันรูฟพาโนรามิค'
   },
   {
@@ -155,6 +155,21 @@ export const INITIAL_CARS = [
     plate_number: '3กฮ 5512 ขอนแก่น',
     image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
     description: 'รถอเนกประสงค์ 7 ที่นั่งสไตล์พรีเมียม กว้างสบาย ประตูสไลด์และสิ่งอำนวยความสะดวกสำหรับครอบครัวใหญ่'
+  },
+  {
+    car_id: 'CAR-009',
+    brand: 'Nissan',
+    model: 'Almera 1.0 VL Turbo',
+    type: 'Sedan',
+    price_per_day: 1199,
+    status: 'ว่าง',
+    seats: 5,
+    transmission: 'ออโต้ (CVT)',
+    fuel: 'เบนซิน',
+    year: 2024,
+    plate_number: '5กฐ 9923 ขอนแก่น',
+    image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80',
+    description: 'รถซีดานขนาดเล็ก กว้างขวาง ประหยัดน้ำมันด้วยเครื่องยนต์เทอร์โบ 1.0 ลิตร ขับขี่คล่องตัวในเมือง'
   }
 ];
 
@@ -174,7 +189,7 @@ export const INITIAL_BOOKINGS = [
     total_days: 3,
     price_per_day: 1299,
     total_price: 3897,
-    status: 'ยืนยันแล้ว',
+    status: 'คืนรถแล้ว',
     created_at: '2025-08-20 10:30',
     payment_method: 'โอนเงิน (PromptPay/Bank Transfer)',
     payment_slip: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=500&q=80'
@@ -228,7 +243,7 @@ export const INITIAL_BOOKINGS = [
     car_id: 'CAR-004',
     car_name: 'MG ZS EV 1.5 X',
     car_plate: '8กน 3310 ชลบุรี',
-    car_image: 'https://images.unsplash.com/photo-1541348263662-e082662dc324?auto=format&fit=crop&w=800&q=80',
+    car_image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&q=80',
     start_date: '2025-07-05',
     end_date: '2025-07-07',
     total_days: 2,
