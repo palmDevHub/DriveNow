@@ -27,9 +27,9 @@ export const CarFilter = () => {
     <div className="bg-slate-950/60 backdrop-blur-2xl rounded-[2rem] p-6 border border-slate-800 shadow-2xl space-y-6">
       
       {/* Top Search Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div className="flex gap-2 sm:gap-4">
         {/* Search Input Keyword */}
-        <div className="md:col-span-11 relative group">
+        <div className="flex-1 relative group">
           <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-blue-400 transition-colors z-10" />
           <input
             type="text"
@@ -49,11 +49,11 @@ export const CarFilter = () => {
         </div>
 
         {/* Clear Filters Button */}
-        <div className="md:col-span-1 flex items-center">
+        <div className="shrink-0 flex items-center">
           <button
             onClick={handleReset}
             title={language === 'en' ? 'Reset Filters' : 'ล้างตัวกรอง'}
-            className="w-full h-full min-h-[56px] flex items-center justify-center p-3 bg-slate-900/80 backdrop-blur-md border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white rounded-2xl transition-all duration-300"
+            className="w-[52px] sm:w-[56px] h-full min-h-[52px] sm:min-h-[56px] flex items-center justify-center p-3 bg-slate-900/80 backdrop-blur-md border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white rounded-2xl transition-all duration-300"
           >
             <X className="w-5 h-5" />
           </button>
