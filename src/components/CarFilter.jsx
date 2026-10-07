@@ -6,16 +6,24 @@ import { motion } from 'framer-motion';
 export const CarFilter = () => {
   const { searchFilter, setSearchFilter, t, language } = useApp();
 
-  const categories = [language === 'en' ? 'All' : 'ทั้งหมด', 'Sedan', 'SUV', 'EV', 'Truck', 'MPV'];
+  const allText = language === 'en' ? 'All' : 'ทั้งหมด';
+  const categories = searchFilter.vehicleType === 'Mt' 
+    ? [allText, 'Scooter', 'Sport']
+    : [allText, 'Sedan', 'SUV', 'EV', 'Truck', 'MPV'];
 
   const handleCategoryClick = (cat) => {
     setSearchFilter(prev => ({ ...prev, category: cat }));
+  };
+
+  const handleVehicleTypeClick = (type) => {
+    setSearchFilter(prev => ({ ...prev, vehicleType: type, category: allText }));
   };
 
   const handleReset = () => {
     setSearchFilter({
       keyword: '',
       category: language === 'en' ? 'All' : 'ทั้งหมด',
+      vehicleType: 'Car',
       minPrice: 0,
       maxPrice: 5000,
       startDate: '',
@@ -26,6 +34,26 @@ export const CarFilter = () => {
   return (
     <div className="bg-slate-950/60 backdrop-blur-2xl rounded-[2rem] p-6 border border-slate-800 shadow-2xl space-y-6">
       
+      {/* Vehicle Type Toggle */}
+      <div className="flex bg-slate-900/80 p-1.5 rounded-2xl w-fit border border-slate-800">
+        <button
+          onClick={() => handleVehicleTypeClick('Car')}
+          className={`px-5 py-2 rounded-xl text-sm font-medium transition-all ${
+            searchFilter.vehicleType === 'Car' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+          }`}
+        >
+          {language === 'en' ? 'Car' : 'รถยนต์'}
+        </button>
+        <button
+          onClick={() => handleVehicleTypeClick('Mt')}
+          className={`px-5 py-2 rounded-xl text-sm font-medium transition-all ${
+            searchFilter.vehicleType === 'Mt' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+          }`}
+        >
+          {language === 'en' ? 'Motorcycle' : 'มอเตอร์ไซค์ (Mt)'}
+        </button>
+      </div>
+
       {/* Top Search Bar */}
       <div className="flex gap-2 sm:gap-4">
         {/* Search Input Keyword */}

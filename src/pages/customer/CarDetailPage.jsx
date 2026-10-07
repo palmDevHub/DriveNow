@@ -35,6 +35,17 @@ function useCountUp(endValue, duration = 800) {
   }, [endValue]);
   return count;
 }
+const provincePrices = [
+  { id: 'songkhla', name: 'สงขลา - หาดใหญ่', price: 1000 },
+  { id: 'phatthalung', name: 'พัทลุง', price: 1050 },
+  { id: 'satun', name: 'สตูล', price: 1050 },
+  { id: 'trang', name: 'ตรัง', price: 1100 },
+  { id: 'pattani', name: 'ปัตตานี', price: 1100 },
+  { id: 'nakhon', name: 'นครศรี', price: 1150 },
+  { id: 'krabi', name: 'กระบี่', price: 1250 },
+  { id: 'surat', name: 'สุราษฎร์', price: 1300 },
+  { id: 'phuket', name: 'ภูเก็ต', price: 1300 },
+];
 
 export const CarDetailPage = () => {
   const { selectedCar, cars, setCurrentView, setBookingDraft, createBooking, t, language } = useApp();
@@ -53,8 +64,17 @@ export const CarDetailPage = () => {
   const statusInfo = getCarStatusBadge(car.status, language);
   const isAvailable = car.status === 'ว่าง' || car.status === 'available';
 
+  const [selectedProvinceId, setSelectedProvinceId] = useState(
+    car.vehicle_type === 'Car' ? provincePrices[0].id : ''
+  );
+  
+  const selectedProvince = provincePrices.find(p => p.id === selectedProvinceId);
+  const effectivePricePerDay = car.vehicle_type === 'Car' && selectedProvince 
+    ? selectedProvince.price 
+    : car.price_per_day;
+
   const totalDays = calculateDays(startDate, endDate);
-  const rentalPrice = car.price_per_day * totalDays;
+  const rentalPrice = effectivePricePerDay * totalDays;
   const deposit = 5000;
   const totalPrice = rentalPrice + deposit;
   const animatedTotalPrice = useCountUp(totalPrice);
@@ -82,7 +102,8 @@ export const CarDetailPage = () => {
       totalDays: totalDays,
       rentalPrice: rentalPrice,
       deposit: deposit,
-      totalPrice: totalPrice
+      totalPrice: totalPrice,
+      provinceName: selectedProvince?.name
     });
     setCurrentView('checkout');
   };
@@ -220,10 +241,7 @@ export const CarDetailPage = () => {
                     <Fuel className="w-3.5 h-3.5 text-blue-400" /> {car.fuel}
                   </p>
                 </div>
-                <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
-                  <span className="text-slate-400 text-[10px]">{isEn ? 'License Plate' : 'ทะเบียนรถ'}</span>
-                  <p className="font-bold text-white">{car.plate_number || 'กข-XXXX'}</p>
-                </div>
+
                 <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1 col-span-2">
                   <span className="text-slate-400 text-[10px]">{isEn ? 'Insurance' : 'ประกันภัย'}</span>
                   <p className="font-bold text-emerald-400 flex items-center gap-1">
@@ -257,6 +275,53 @@ export const CarDetailPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Service Areas & Pricing */}
+            {car.vehicle_type === 'Car' && (
+              <div className="pt-4 border-t border-slate-800 space-y-4">
+                <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  📍✨ {isEn ? 'Car Rental Prices by Province (Cars Only)' : 'ค่าเช่ารถแต่ละจังหวัด (สำหรับรถยนต์เท่านั้น)'} ✨🚘
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 สงขลา - หาดใหญ่ 🏝️</span>
+                    <span className="font-bold text-blue-400">1,000 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 พัทลุง 🌿</span>
+                    <span className="font-bold text-blue-400">1,050 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 สตูล 🌊</span>
+                    <span className="font-bold text-blue-400">1,050 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 ตรัง 🏖️</span>
+                    <span className="font-bold text-blue-400">1,100 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 ปัตตานี 🌙</span>
+                    <span className="font-bold text-blue-400">1,100 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 นครศรี 🛕</span>
+                    <span className="font-bold text-blue-400">1,150 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 กระบี่ ⛰️</span>
+                    <span className="font-bold text-blue-400">1,250 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 สุราษฎร์ 🏝️</span>
+                    <span className="font-bold text-blue-400">1,300 บาท/วัน</span>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span className="text-slate-300">💥 ภูเก็ต 🌅</span>
+                    <span className="font-bold text-blue-400">1,300 บาท/วัน</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* EV Fuel Saver Calculator */}
             {(car.fuel === 'EV' || car.type === 'EV') && (
@@ -305,11 +370,31 @@ export const CarDetailPage = () => {
               <span className="text-xs font-bold text-slate-400 uppercase">{t.pricePerDay}</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-extrabold text-blue-500 font-prompt">
-                  {formatTHB(car.price_per_day, language)}
+                  {formatTHB(effectivePricePerDay, language)}
                 </span>
                 <span className="text-xs text-slate-400">{t.perDay}</span>
               </div>
             </div>
+
+            {/* Province Selector for Cars */}
+            {car.vehicle_type === 'Car' && (
+              <div className="space-y-1">
+                <label className="text-[11px] text-slate-400 font-semibold flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-blue-500" /> {isEn ? 'Select Province' : 'เลือกจังหวัดที่ต้องการใช้งาน'}
+                </label>
+                <select
+                  value={selectedProvinceId}
+                  onChange={(e) => setSelectedProvinceId(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl text-xs text-white outline-none cursor-pointer"
+                >
+                  {provincePrices.map(prov => (
+                    <option key={prov.id} value={prov.id}>
+                      {prov.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Date Range Selector */}
             <div className="space-y-4">
@@ -349,7 +434,7 @@ export const CarDetailPage = () => {
                 <span className="font-bold text-white">{totalDays} {t.daysUnit}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>{isEn ? 'Rental Rate' : 'อัตราค่าเช่า'} ({formatTHB(car.price_per_day, language)} × {totalDays} {t.daysUnit}):</span>
+                <span>{isEn ? 'Rental Rate' : 'อัตราค่าเช่า'} ({formatTHB(effectivePricePerDay, language)} × {totalDays} {t.daysUnit}):</span>
                 <span>{formatTHB(rentalPrice, language)}</span>
               </div>
               <div className="flex justify-between text-slate-400">

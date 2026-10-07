@@ -102,7 +102,7 @@ export const MyBookingsPage = () => {
 
                     <h3 className="text-base font-bold text-white">{b.car_name}</h3>
                     <p className="text-xs text-slate-400 flex items-center gap-2">
-                      <span>{t.plateNo} {b.car_plate || '-'}</span>
+
                       <span>•</span>
                       <span>{formatDate(b.start_date, language)} – {formatDate(b.end_date, language)} ({b.total_days} {t.daysUnit})</span>
                     </p>

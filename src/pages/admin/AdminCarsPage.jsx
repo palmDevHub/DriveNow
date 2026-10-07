@@ -173,7 +173,7 @@ export const AdminCarsPage = () => {
                     <td className="p-4 font-mono font-bold text-blue-400">{car.car_id}</td>
                     <td className="p-4">
                       <div className="font-bold text-white text-sm">{car.brand} {car.model}</div>
-                      <div className="text-[10px] text-slate-400">{isEn ? 'Plate:' : 'ทะเบียน:'} {car.plate_number || '-'}</div>
+                      
                     </td>
                     <td className="p-4">
                       <div className="text-white font-medium">{car.type}</div>

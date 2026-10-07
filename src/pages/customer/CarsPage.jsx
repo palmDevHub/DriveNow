@@ -11,6 +11,11 @@ export const CarsPage = () => {
 
   // Filter cars based on searchFilter
   const filteredCars = cars.filter(car => {
+    // Vehicle Type match (Car vs Mt)
+    if (searchFilter.vehicleType && car.vehicle_type !== searchFilter.vehicleType) {
+      return false;
+    }
+
     // Category match
     if (searchFilter.category !== 'ทั้งหมด' && searchFilter.category !== 'All' && car.type.toLowerCase() !== searchFilter.category.toLowerCase()) {
       return false;

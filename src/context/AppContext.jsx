@@ -16,6 +16,12 @@ export const AppProvider = ({ children }) => {
     if (saved) {
       let parsed = JSON.parse(saved);
       if (parsed.length === 0) return INITIAL_CARS;
+      
+      // Force reload from INITIAL_CARS if old data lacks vehicle_type, doesn't have the new local images, contains old deleted cars, or lacks new model names/prices
+      if (parsed[0] && (!parsed[0].vehicle_type || parsed[0].image !== '/Car1.jpg' || parsed.length !== 6 || parsed[0].model !== 'ATIV' || (parsed[1] && parsed[1].model !== 'ATIV') || (parsed[3] && parsed[3].price_per_day !== 400) || (parsed[4] && parsed[4].price_per_day !== 300) || (parsed[5] && parsed[5].price_per_day !== 450))) {
+        return INITIAL_CARS;
+      }
+
       parsed = parsed.map(c => 
         c.image === 'https://images.unsplash.com/photo-1541348263662-e082662dc324?auto=format&fit=crop&w=800&q=80'
         ? { ...c, image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=800&q=80' }
@@ -122,6 +128,7 @@ export const AppProvider = ({ children }) => {
   const [searchFilter, setSearchFilter] = useState({
     keyword: '',
     category: 'ทั้งหมด',
+    vehicleType: 'Car',
     minPrice: 0,
     maxPrice: 5000,
     startDate: '',

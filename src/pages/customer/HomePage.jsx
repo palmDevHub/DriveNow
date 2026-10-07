@@ -22,11 +22,12 @@ import {
 } from 'lucide-react';
 
 export const HomePage = () => {
-  const { cars, setCurrentView, setSearchFilter, handleSelectCarForBooking, t, language } = useApp();
+  const { cars, searchFilter, setCurrentView, setSearchFilter, handleSelectCarForBooking, t, language } = useApp();
   const isEn = language === 'en';
 
-  // Featured / Popular cars (Top 4)
-  const popularCars = cars.slice(0, 4);
+  // Show both cars and motorcycles on the homepage
+  const featuredCars = cars;
+  const popularCars = featuredCars.slice(0, 8);
 
   return (
     <div className="space-y-12 pb-12 pt-2 sm:pt-6">
@@ -80,7 +81,7 @@ export const HomePage = () => {
             onClick={() => setCurrentView('cars')}
             className="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-2 transition"
           >
-            <span>{t.viewAllCars} ({cars.length} {t.unitsCount})</span>
+            <span>{t.viewAllCars} ({featuredCars.length} {t.unitsCount})</span>
             <ArrowRight className="w-4 h-4 text-blue-500" />
           </button>
         </div>
