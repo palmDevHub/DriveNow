@@ -75,7 +75,7 @@ export const CarDetailPage = () => {
 
   const totalDays = calculateDays(startDate, endDate);
   const rentalPrice = effectivePricePerDay * totalDays;
-  const deposit = 5000;
+  const deposit = car.vehicle_type === 'Car' ? 5000 : 0;
   const totalPrice = rentalPrice + deposit;
   const animatedTotalPrice = useCountUp(totalPrice);
 
@@ -251,31 +251,6 @@ export const CarDetailPage = () => {
               </div>
             </div>
 
-            {/* Included Extras */}
-            <div className="pt-4 border-t border-slate-800 space-y-3">
-              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                {isEn ? 'Services Included' : 'บริการที่รวมในราคานี้แล้ว'}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span>{isEn ? 'Free 24/7 Emergency Assistance' : 'ฟรีบริการช่วยเหลือฉุกเฉิน 24 ชั่วโมง'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span>{isEn ? 'Free Full Tank Fuel on Pick Up' : 'ฟรีน้ำมันเต็มถังในวันรับรถ'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span>{isEn ? 'Free Delivery within 20 KM' : 'ฟรีบริการจัดส่งรถฟรีระยะทาง 20 กม.'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span>{isEn ? 'Unlimited Mileage' : 'ไม่มีจำกัดระยะทาง (Unlimited Mileage)'}</span>
-                </div>
-              </div>
-            </div>
-
             {/* Service Areas & Pricing */}
             {car.vehicle_type === 'Car' && (
               <div className="pt-4 border-t border-slate-800 space-y-4">
@@ -437,10 +412,12 @@ export const CarDetailPage = () => {
                 <span>{isEn ? 'Rental Rate' : 'อัตราค่าเช่า'} ({formatTHB(effectivePricePerDay, language)} × {totalDays} {t.daysUnit}):</span>
                 <span>{formatTHB(rentalPrice, language)}</span>
               </div>
-              <div className="flex justify-between text-slate-400">
-                <span>{isEn ? 'Security Deposit (Refundable)' : 'เงินมัดจำ (คืนเมื่อส่งรถ)'}:</span>
-                <span>{formatTHB(deposit, language)}</span>
-              </div>
+              {deposit > 0 && (
+                <div className="flex justify-between text-slate-400">
+                  <span>{isEn ? 'Security Deposit (Refundable)' : 'เงินมัดจำ (คืนเมื่อส่งรถ)'}:</span>
+                  <span>{formatTHB(deposit, language)}</span>
+                </div>
+              )}
               <div className="border-t border-slate-800 pt-2 flex justify-between items-baseline">
                 <span className="font-bold text-white">{t.totalPriceLabel}:</span>
                 <span className="text-xl font-extrabold text-blue-500 font-prompt transition-all duration-300 transform scale-110 origin-right">
