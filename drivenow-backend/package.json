@@ -1,8 +1,11 @@
 {
   "name": "drivenow-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "commonjs",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "sync": "node syncAppDataToMysql.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -4,7 +4,10 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-require('dotenv').config();
+const path = require('path');
+// Load .env from root and backend directory
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,8 +24,9 @@ app.use(cookieParser());
 // MySQL Connection Pool with auto-reconnection
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '1234',
+  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '1234',
   database: process.env.DB_NAME || 'drivenow_db',
   waitForConnections: true,
   connectionLimit: 10,
@@ -101,7 +105,7 @@ app.post('/api/auth/register', async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const userId = `USR-${Date.now().toString().slice(-6)}`;
-    const userRole = role === 'admin' ? 'admin' : 'customer';
+    const userRole = 'customer'; // กำหนดให้ผู้สมัครใหม่เป็น customer เสมอ เพื่อความปลอดภัย (ป้องกันการส่ง role: admin)
 
     await pool.query(
       `INSERT INTO users (user_id, username, name, email, password, phone, role) VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -156,17 +160,12 @@ app.post('/api/auth/login', async (req, res, next) => {
 
     const user = users[0];
 
-    // Verify password with bcryptjs (with fallback for demo plain-text compatibility)
+    // Verify password with bcryptjs (with fallback for plain-text compatibility if old records exist)
     let isMatch = false;
     if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
       isMatch = await bcrypt.compare(password, user.password);
     } else {
       isMatch = user.password === password;
-    }
-
-    // Direct password shortcuts for test accounts if needed
-    if (!isMatch && (password === '1234' || password === 'password123' || password === 'adminpassword')) {
-      isMatch = true;
     }
 
     if (!isMatch) {

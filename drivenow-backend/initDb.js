@@ -1,17 +1,24 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+
+// Load environment variables from root or backend directory
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const DB_CONFIG = {
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'drivenow_db'
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '1234',
+  database: process.env.DB_NAME || 'drivenow_db'
 };
 
 async function initDatabase() {
   console.log('Connecting to MySQL...');
   const connection = await mysql.createConnection({
     host: DB_CONFIG.host,
+    port: DB_CONFIG.port,
     user: DB_CONFIG.user,
     password: DB_CONFIG.password
   });
@@ -135,10 +142,10 @@ async function initDatabase() {
   console.log('Seeding cars...');
   const cars = [
     ['CAR-001', 'Car', 'Toyota', 'ATIV', 'Sedan', 1299.00, 'ว่าง', 5, 'ออโต้ (CVT)', 'เบนซิน-ไฮบริด', 2024, 'กข 4592 สงขลา', '/Car1.jpg', 'รถซีดานขนาดกลางประหยัดน้ำมัน ขับนุ่มเงียบ เหมาะสำหรับการเดินทางในเมืองและท่องเที่ยวต่างจังหวัด'],
-    ['CAR-002', 'Car', 'Toyota', 'ATIV', 'Sedan', 1499.00, 'ว่าง', 5, 'ออโต้ (e-CVT)', 'ไฮบริด', 2024, 'ขก 8821 สงขลา', '/Car2.jpg', 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Honda SENSING'],
+    ['CAR-002', 'Car', 'Toyota', 'ATIV', 'Sedan', 1499.00, 'ว่าง', 5, 'ออโต้ (e-CVT)', 'ไฮบริด', 2024, 'ขก 8821 สงขลา', '/Car2.jpg', 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Toyota Safety Sense'],
     ['CAR-003', 'Car', 'Toyota', 'ATIV', 'Sedan', 1299.00, 'ว่าง', 5, 'ออโต้ (CVT)', 'เบนซิน', 2024, '7กศ 1102 สงขลา', '/Car3.jpg', 'รถยนต์ซีดานดีไซน์สปอร์ต ขับขี่สบาย ประหยัดน้ำมัน'],
     ['MT-001', 'Mt', 'Yamaha', 'Fazzio', 'Scooter', 400.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '1กย 8821 สงขลา', '/Mt1.jpg', 'มอเตอร์ไซค์ออโตเมติกยอดนิยม ขับขี่สบาย ประหยัดน้ำมัน'],
-    ['MT-002', 'Mt', 'Honda', 'Wave 110i', 'Scooter', 300.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '2กข 4412 สงขลา', '/Mt2.jpg', 'บิ๊กสกู๊ตเตอร์ดีไซน์สปอร์ต เครื่องยนต์แรง'],
+    ['MT-002', 'Mt', 'Honda', 'Wave 110i', 'Scooter', 300.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '2กข 4412 สงขลา', '/Mt2.jpg', 'รถมอเตอร์ไซค์ครอบครัวยอดนิยม ประหยัดน้ำมัน ทนทาน คล่องตัวในทุกการเดินทาง'],
     ['MT-003', 'Mt', 'Honda', 'Giorno', 'Scooter', 450.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '3กศ 9901 สงขลา', '/Mt3.jpg', 'สกู๊ตเตอร์คลาสสิกดีไซน์พรีเมียม ขับขี่โดดเด่นไม่ซ้ำใคร']
   ];
 

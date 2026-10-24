@@ -97,19 +97,19 @@ CREATE TABLE IF NOT EXISTS `payments` (
 
 -- Users: Passwords hashed with bcryptjs (Password for User, andmin, palm, thanwa, palm45 is: 1234)
 INSERT INTO `users` (`user_id`, `username`, `name`, `email`, `password`, `phone`, `role`, `id_card`, `driver_license`, `avatar`) VALUES
-('USR-USER', 'User', 'User (ลูกค้าทั่วไป)', 'user@drivenow.com', '$2a$10$tZ2cOq49Fv78WlH9vT8G6ekN7z8c3c1O2gX6P1L0b3vR9N7M6Y1G2', '081-234-5678', 'customer', '1-1002-99881-22-3', 'DL-99182347', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'),
-('USR-ADMIN', 'andmin', 'Admin (ผู้ดูแลระบบ)', 'andmin@drivenow.com', '$2a$10$tZ2cOq49Fv78WlH9vT8G6ekN7z8c3c1O2gX6P1L0b3vR9N7M6Y1G2', '02-777-8899', 'admin', '1-0000-00000-00-0', 'DL-ADMIN001', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'),
-('USR-001', 'palm', 'นายพงศกร ใจดี', 'palm@example.com', '$2a$10$tZ2cOq49Fv78WlH9vT8G6ekN7z8c3c1O2gX6P1L0b3vR9N7M6Y1G2', '081-234-5678', 'customer', '1-1002-99881-22-3', 'DL-99182347', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'),
-('USR-002', 'thanwa', 'นางสาวธันวา สุขเจริญ', 'thanwa@example.com', '$2a$10$tZ2cOq49Fv78WlH9vT8G6ekN7z8c3c1O2gX6P1L0b3vR9N7M6Y1G2', '089-456-7890', 'customer', '3-9812-44123-11-9', 'DL-44819231', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80'),
-('USR-003', 'palm45', 'พงศกร อินชุม', 'palm45@gmail.com', '$2a$10$tZ2cOq49Fv78WlH9vT8G6ekN7z8c3c1O2gX6P1L0b3vR9N7M6Y1G2', '088-765-4321', 'customer', '1-9002-44123-88-2', 'DL-88192341', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80');
+('USR-USER', 'User', 'User (ลูกค้าทั่วไป)', 'user@drivenow.com', '$2b$10$HYfu22yk3kkTmb.5maWqLeBctX8alTBvNAJzdO3hVVGZ1jhox2wEy', '081-234-5678', 'customer', '1-1002-99881-22-3', 'DL-99182347', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'),
+('USR-ADMIN', 'andmin', 'Admin (ผู้ดูแลระบบ)', 'andmin@drivenow.com', '$2b$10$HYfu22yk3kkTmb.5maWqLeBctX8alTBvNAJzdO3hVVGZ1jhox2wEy', '02-777-8899', 'admin', '1-0000-00000-00-0', 'DL-ADMIN001', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'),
+('USR-001', 'palm', 'นายพงศกร ใจดี', 'palm@example.com', '$2b$10$HYfu22yk3kkTmb.5maWqLeBctX8alTBvNAJzdO3hVVGZ1jhox2wEy', '081-234-5678', 'customer', '1-1002-99881-22-3', 'DL-99182347', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'),
+('USR-002', 'thanwa', 'นางสาวธันวา สุขเจริญ', 'thanwa@example.com', '$2b$10$HYfu22yk3kkTmb.5maWqLeBctX8alTBvNAJzdO3hVVGZ1jhox2wEy', '089-456-7890', 'customer', '3-9812-44123-11-9', 'DL-44819231', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80'),
+('USR-003', 'palm45', 'พงศกร อินชุม', 'palm45@gmail.com', '$2b$10$HYfu22yk3kkTmb.5maWqLeBctX8alTBvNAJzdO3hVVGZ1jhox2wEy', '088-765-4321', 'customer', '1-9002-44123-88-2', 'DL-88192341', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80');
 
 -- Cars: Current 6 Vehicles matching the Application (3 ATIV Cars + 3 Motorcycles)
 INSERT INTO `cars` (`car_id`, `vehicle_type`, `brand`, `model`, `type`, `price_per_day`, `status`, `seats`, `transmission`, `fuel`, `year`, `plate_number`, `image`, `description`) VALUES
 ('CAR-001', 'Car', 'Toyota', 'ATIV', 'Sedan', 1299.00, 'ว่าง', 5, 'ออโต้ (CVT)', 'เบนซิน-ไฮบริด', 2024, 'กข 4592 สงขลา', '/Car1.jpg', 'รถซีดานขนาดกลางประหยัดน้ำมัน ขับนุ่มเงียบ เหมาะสำหรับการเดินทางในเมืองและท่องเที่ยวต่างจังหวัด'),
-('CAR-002', 'Car', 'Toyota', 'ATIV', 'Sedan', 1499.00, 'ว่าง', 5, 'ออโต้ (e-CVT)', 'ไฮบริด', 2024, 'ขก 8821 สงขลา', '/Car2.jpg', 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Honda SENSING'),
+('CAR-002', 'Car', 'Toyota', 'ATIV', 'Sedan', 1499.00, 'ว่าง', 5, 'ออโต้ (e-CVT)', 'ไฮบริด', 2024, 'ขก 8821 สงขลา', '/Car2.jpg', 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Toyota Safety Sense'),
 ('CAR-003', 'Car', 'Toyota', 'ATIV', 'Sedan', 1299.00, 'ว่าง', 5, 'ออโต้ (CVT)', 'เบนซิน', 2024, '7กศ 1102 สงขลา', '/Car3.jpg', 'รถยนต์ซีดานดีไซน์สปอร์ต ขับขี่สบาย ประหยัดน้ำมัน'),
 ('MT-001', 'Mt', 'Yamaha', 'Fazzio', 'Scooter', 400.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '1กย 8821 สงขลา', '/Mt1.jpg', 'มอเตอร์ไซค์ออโตเมติกยอดนิยม ขับขี่สบาย ประหยัดน้ำมัน'),
-('MT-002', 'Mt', 'Honda', 'Wave 110i', 'Scooter', 300.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '2กข 4412 สงขลา', '/Mt2.jpg', 'บิ๊กสกู๊ตเตอร์ดีไซน์สปอร์ต เครื่องยนต์แรง'),
+('MT-002', 'Mt', 'Honda', 'Wave 110i', 'Scooter', 300.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '2กข 4412 สงขลา', '/Mt2.jpg', 'รถมอเตอร์ไซค์ครอบครัวยอดนิยม ประหยัดน้ำมัน ทนทาน คล่องตัวในทุกการเดินทาง'),
 ('MT-003', 'Mt', 'Honda', 'Giorno', 'Scooter', 450.00, 'ว่าง', 2, 'ออโต้', 'เบนซิน', 2023, '3กศ 9901 สงขลา', '/Mt3.jpg', 'สกู๊ตเตอร์คลาสสิกดีไซน์พรีเมียม ขับขี่โดดเด่นไม่ซ้ำใคร');
 
 -- Bookings: Current Bookings matching Application & Relational Foreign Keys

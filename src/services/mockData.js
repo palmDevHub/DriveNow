@@ -80,7 +80,7 @@ export const INITIAL_CARS = [
     fuel: 'ไฮบริด',
     year: 2024,
     image: '/Car2.jpg',
-    description: 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Honda SENSING'
+    description: 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Toyota Safety Sense'
   },
   {
     car_id: 'CAR-003',
@@ -125,7 +125,7 @@ export const INITIAL_CARS = [
     fuel: 'เบนซิน',
     year: 2023,
     image: '/Mt2.jpg',
-    description: 'บิ๊กสกู๊ตเตอร์ดีไซน์สปอร์ต เครื่องยนต์แรง'
+    description: 'รถมอเตอร์ไซค์ครอบครัวยอดนิยม ประหยัดน้ำมัน ทนทาน คล่องตัวในทุกการเดินทาง'
   },
   {
     vehicle_type: 'Mt',

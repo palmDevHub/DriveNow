@@ -1,11 +1,17 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+
+// Load environment variables from root or backend directory
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const DB_CONFIG = {
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'drivenow_db'
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '1234',
+  database: process.env.DB_NAME || 'drivenow_db'
 };
 
 async function syncData() {
@@ -129,7 +135,7 @@ async function syncData() {
       year: 2024,
       plate_number: 'ขก 8821 สงขลา',
       image: '/Car2.jpg',
-      description: 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Honda SENSING'
+      description: 'ดีไซน์สปอร์ตหรูหรา ขุมพลังไฮบริดตอบสนองทันใจ สมรรถนะเยี่ยม พร้อมระบบความปลอดภัย Toyota Safety Sense'
     },
     {
       car_id: 'CAR-003',
@@ -177,7 +183,7 @@ async function syncData() {
       year: 2023,
       plate_number: '2กข 4412 สงขลา',
       image: '/Mt2.jpg',
-      description: 'บิ๊กสกู๊ตเตอร์ดีไซน์สปอร์ต เครื่องยนต์แรง'
+      description: 'รถมอเตอร์ไซค์ครอบครัวยอดนิยม ประหยัดน้ำมัน ทนทาน คล่องตัวในทุกการเดินทาง'
     },
     {
       car_id: 'MT-003',
