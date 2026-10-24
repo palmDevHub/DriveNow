@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { NotificationToast } from './components/NotificationToast';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { ChatWidget } from './components/ChatWidget';
+import { CookieConsent } from './components/CookieConsent';
 
 // Customer Pages
 import { HomePage } from './pages/customer/HomePage';
@@ -79,6 +80,7 @@ const MainContent = () => {
       <Footer />
       <ScrollToTopButton />
       <ChatWidget />
+      <CookieConsent />
     </div>
   );
 };

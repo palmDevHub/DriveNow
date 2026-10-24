@@ -196,7 +196,22 @@ export const translations = {
     themeDark: 'โหมดมืด',
     themeLight: 'โหมดสว่าง',
     langTh: 'ไทย',
-    langEn: 'English'
+    langEn: 'English',
+
+    // Cookie & Privacy (PDPA)
+    cookieTitle: 'เราใช้คุกกี้เพื่อพัฒนาประสบการณ์ของคุณ (Cookie Policy)',
+    cookieDesc: 'DriveNow มีการใช้คุกกี้ที่จำเป็นต่อระบบความปลอดภัย (HttpOnly Cookie) และคุกกี้เพื่อเพิ่มประสิทธิภาพการใช้งานตามมาตรฐาน PDPA คุณสามารถเลือกยอมรับหรือปรับแต่งการตั้งค่าได้',
+    cookieAcceptAll: 'ยอมรับทั้งหมด',
+    cookieEssentialOnly: 'เฉพาะที่จำเป็น',
+    cookiePreferences: 'ตั้งค่าคุกกี้',
+    cookieSavePreferences: 'บันทึกการตั้งค่า',
+    cookieNecessaryTitle: 'คุกกี้ที่จำเป็น (Strictly Necessary)',
+    cookieNecessaryDesc: 'จำเป็นต่อการเข้าสู่ระบบที่ปลอดภัย (HttpOnly Token) และความปลอดภัยของเซสชัน (เปิดใช้งานตลอดเวลา)',
+    cookieAnalyticsTitle: 'คุกกี้เพื่อการวิเคราะห์ (Analytics & Performance)',
+    cookieAnalyticsDesc: 'ช่วยให้เราทราบสถิติการใช้งานและปรับปรุงความเร็วของระบบเช่ารถ',
+    cookieMarketingTitle: 'คุกกี้จดจำความชื่นชอบ (Preferences)',
+    cookieMarketingDesc: 'จดจำการตั้งค่าธีมและภาษาเพื่อให้คุณใช้งานได้สะดวกสบายยิ่งขึ้น',
+    cookieAlwaysActive: 'เปิดใช้งานตลอดเวลา'
   },
   en: {
     // Navigation
@@ -395,7 +410,22 @@ export const translations = {
     themeDark: 'Dark Mode',
     themeLight: 'Light Mode',
     langTh: 'Thai',
-    langEn: 'English'
+    langEn: 'English',
+
+    // Cookie & Privacy (PDPA)
+    cookieTitle: 'We use cookies to improve your experience (Cookie Policy)',
+    cookieDesc: 'DriveNow uses essential cookies for secure login (HttpOnly Token) and analytical cookies to optimize performance, ensuring the smoothest car rental journey in compliance with PDPA privacy regulations.',
+    cookieAcceptAll: 'Accept All',
+    cookieEssentialOnly: 'Essential Only',
+    cookiePreferences: 'Customize',
+    cookieSavePreferences: 'Save Preferences',
+    cookieNecessaryTitle: 'Strictly Necessary Cookies',
+    cookieNecessaryDesc: 'Required for core website security, JWT authentication (HttpOnly Cookie), and session safety (Always Active).',
+    cookieAnalyticsTitle: 'Analytics & Performance',
+    cookieAnalyticsDesc: 'Helps us measure traffic and understand how renters interact with our service to improve performance.',
+    cookieMarketingTitle: 'Preferences & Experience',
+    cookieMarketingDesc: 'Remembers your custom settings like dark/light theme and language preferences across sessions.',
+    cookieAlwaysActive: 'Always Active'
   }
 };
 

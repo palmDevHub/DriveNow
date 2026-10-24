@@ -57,10 +57,6 @@ export const HomePage = () => {
         </a>
       </section>
 
-      {/* Embedded CarFilter moved below the image banner */}
-      <div className="w-full max-w-5xl px-4 sm:px-6 mx-auto relative z-40 mt-6">
-        <CarFilter />
-      </div>
 
 
 

@@ -214,9 +214,13 @@ export const MyBookingsPage = () => {
             <p className="text-xs text-slate-400">{t.bookingId}: {selectedSlipModal.booking_id}</p>
 
             <img
-              src={selectedSlipModal.payment_slip}
+              src={selectedSlipModal.payment_slip || '/demo-payment-slip.svg'}
               alt="Payment Slip"
               className="w-full h-80 object-cover rounded-2xl border border-slate-800"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/demo-payment-slip.svg';
+              }}
             />
 
             <div className="flex justify-between items-center text-xs text-slate-400 border-t border-slate-800 pt-3">

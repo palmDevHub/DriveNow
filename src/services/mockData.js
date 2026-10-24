@@ -1,6 +1,31 @@
 export const INITIAL_USERS = [
   {
+    user_id: 'USR-USER',
+    username: 'User',
+    name: 'User (ลูกค้าทั่วไป)',
+    email: 'user@drivenow.com',
+    password: '1234',
+    phone: '081-234-5678',
+    role: 'customer',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+    id_card: '1-1002-99881-22-3',
+    driver_license: 'DL-99182347',
+    created_at: '2025-01-01'
+  },
+  {
+    user_id: 'USR-ADMIN',
+    username: 'andmin',
+    name: 'Admin (ผู้ดูแลระบบ)',
+    email: 'andmin@drivenow.com',
+    password: '1234',
+    phone: '02-777-8899',
+    role: 'admin',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    created_at: '2025-01-01'
+  },
+  {
     user_id: 'USR-001',
+    username: 'palm',
     name: 'นายพงศกร ใจดี',
     email: 'palm@example.com',
     password: 'password123',
@@ -13,6 +38,7 @@ export const INITIAL_USERS = [
   },
   {
     user_id: 'USR-002',
+    username: 'thanwa',
     name: 'นางสาวธันวา สุขเจริญ',
     email: 'thanwa@example.com',
     password: 'password123',
@@ -22,31 +48,6 @@ export const INITIAL_USERS = [
     id_card: '3-9812-44123-11-9',
     driver_license: 'DL-44819231',
     created_at: '2025-02-14'
-  },
-  {
-    user_id: 'USR-003',
-    name: 'ผู้ดูแลระบบ (Admin DriveNow)',
-    email: 'admin@drivenow.com',
-    password: 'adminpassword',
-    phone: '02-777-8899',
-    role: 'admin',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    created_at: '2025-01-01'
-  },
-  {
-    vehicle_type: 'Mt',
-    car_id: 'MT-003',
-    brand: 'Vespa',
-    model: 'Sprint 150 i-Get ABS',
-    type: 'Scooter',
-    price_per_day: 900,
-    status: 'ว่าง',
-    seats: 2,
-    transmission: 'ออโต้',
-    fuel: 'เบนซิน',
-    year: 2023,
-    image: '/Mt3.jpg',
-    description: 'สกู๊ตเตอร์คลาสสิกดีไซน์พรีเมียม ขับขี่โดดเด่นไม่ซ้ำใคร'
   }
 ];
 

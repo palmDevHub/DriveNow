@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe" />
+      <stop offset="40%" stop-color="#bae6fd" />
+      <stop offset="70%" stop-color="#e0f2fe" />
+      <stop offset="100%" stop-color="#7dd3fc" />
+    </linearGradient>
+
+    <!-- Chip Gradient -->
+    <linearGradient id="chipGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Hologram Gradient -->
+    <linearGradient id="holoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.3" />
+    </linearGradient>
+
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+
+    <!-- Pattern -->
+    <pattern id="guilloche" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 0 20 Q 10 5, 20 20 T 40 20" fill="none" stroke="#38bdf8" stroke-width="0.8" opacity="0.35"/>
+      <path d="M 0 20 Q 10 35, 20 20 T 40 20" fill="none" stroke="#0284c7" stroke-width="0.8" opacity="0.25"/>
+    </pattern>
+  </defs>
+
+  <!-- Card Base -->
+  <rect x="10" y="10" width="580" height="360" rx="20" fill="url(#cardBg)" stroke="#38bdf8" stroke-width="2" filter="url(#shadow)" />
+  <rect x="10" y="10" width="580" height="360" rx="20" fill="url(#guilloche)" />
+
+  <!-- Top Blue Banner -->
+  <path d="M 10 30 Q 300 15 590 30 L 590 10 L 10 10 Z" fill="#0284c7" opacity="0.2"/>
+
+  <!-- Garuda Emblem (Symbolic Silhouette) -->
+  <g transform="translate(45, 25) scale(0.65)">
+    <path d="M25 5 L35 25 L45 15 L50 35 L40 45 L55 55 L35 55 L30 70 L25 55 L5 55 L20 45 L10 35 L15 15 L25 25 Z" fill="#b91c1c" />
+    <circle cx="30" cy="22" r="7" fill="#dc2626" />
+    <path d="M15 35 Q30 50 45 35" stroke="#991b1b" stroke-width="3" fill="none" />
+  </g>
+
+  <!-- Card Title & Header -->
+  <text x="95" y="42" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0369a1">บัตรประจำตัวประชาชน</text>
+  <text x="260" y="41" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0284c7">Thai National ID Card</text>
+  
+  <!-- Identification Number -->
+  <text x="95" y="75" font-family="sans-serif" font-size="11" fill="#475569">เลขประจำตัวประชาชน</text>
+  <text x="95" y="98" font-family="monospace" font-size="22" font-weight="bold" fill="#0f172a" letter-spacing="3">1 1004 09876 54 3</text>
+
+  <!-- Smart Card Microchip -->
+  <g transform="translate(40, 115)">
+    <rect x="0" y="0" width="60" height="48" rx="8" fill="url(#chipGold)" stroke="#b45309" stroke-width="1.5" />
+    <!-- Chip Contact Lines -->
+    <rect x="15" y="0" width="30" height="48" fill="none" stroke="#78350f" stroke-width="1" />
+    <line x1="0" y1="24" x2="60" y2="24" stroke="#78350f" stroke-width="1" />
+    <circle cx="30" cy="24" r="7" fill="#fef08a" stroke="#78350f" stroke-width="1" />
+  </g>
+
+  <!-- Thai / English Names -->
+  <g transform="translate(125, 125)">
+    <text x="0" y="0" font-family="sans-serif" font-size="11" fill="#64748b">ชื่อตัวและชื่อสกุล</text>
+    <text x="0" y="20" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">นายพงศกร ใจดี</text>
+
+    <text x="0" y="42" font-family="sans-serif" font-size="10" fill="#64748b">Name</text>
+    <text x="35" y="42" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1e293b">Mr. Pongsakorn</text>
+
+    <text x="0" y="60" font-family="sans-serif" font-size="10" fill="#64748b">Last name</text>
+    <text x="55" y="60" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1e293b">Jaidee</text>
+  </g>
+
+  <!-- Date of Birth -->
+  <g transform="translate(125, 215)">
+    <text x="0" y="0" font-family="sans-serif" font-size="10" fill="#64748b">เกิดวันที่ / Date of Birth</text>
+    <text x="0" y="18" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">15 ส.ค. 2538 / 15 Aug 1995</text>
+  </g>
+
+  <!-- Address -->
+  <g transform="translate(125, 260)">
+    <text x="0" y="0" font-family="sans-serif" font-size="10" fill="#64748b">ที่อยู่ / Address</text>
+    <text x="0" y="16" font-family="sans-serif" font-size="12" font-weight="600" fill="#334155">99/42 ถ.กาญจนวนิช ต.คอหงส์ อ.หาดใหญ่ จ.สงขลา</text>
+  </g>
+
+  <!-- Photo Box -->
+  <g transform="translate(420, 80)">
+    <rect x="0" y="0" width="140" height="180" rx="12" fill="#f8fafc" stroke="#38bdf8" stroke-width="2" />
+    <path d="M 0 0 L 140 0 L 140 180 L 0 180 Z" fill="#e2e8f0" rx="12" clip-path="url(#photoClip)"/>
+    
+    <!-- User Avatar Silhouette -->
+    <g transform="translate(20, 20)">
+      <!-- Head -->
+      <circle cx="50" cy="45" r="28" fill="#3b82f6" />
+      <circle cx="50" cy="43" r="24" fill="#60a5fa" />
+      <!-- Hair -->
+      <path d="M 26 40 Q 50 15 74 40 Q 65 24 50 24 Q 35 24 26 40 Z" fill="#1e293b" />
+      <!-- Body / Shoulders -->
+      <path d="M 10 135 C 10 95 30 85 50 85 C 70 85 90 95 90 135 Z" fill="#1d4ed8" />
+      <!-- Collar -->
+      <polygon points="50,95 40,85 50,110 60,85" fill="#ffffff" />
+    </g>
+
+    <!-- Holographic Overlay Badge on Photo -->
+    <circle cx="115" cy="155" r="20" fill="url(#holoGrad)" stroke="#38bdf8" stroke-width="1.5" />
+    <text x="115" y="159" font-family="sans-serif" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">THAI</text>
+  </g>
+
+  <!-- Issue & Expiry Dates Footer -->
+  <g transform="translate(40, 315)">
+    <line x1="0" y1="0" x2="520" y2="0" stroke="#bae6fd" stroke-width="1.5" />
+    <text x="0" y="22" font-family="sans-serif" font-size="10" fill="#64748b">วันออกบัตร: 20 ต.ค. 2567</text>
+    <text x="0" y="36" font-family="sans-serif" font-size="9" fill="#94a3b8">Date of Issue: 20 Oct 2024</text>
+
+    <text x="220" y="22" font-family="sans-serif" font-size="10" fill="#b91c1c" font-weight="bold">วันบัตรหมดอายุ: 20 ต.ค. 2575</text>
+    <text x="220" y="36" font-family="sans-serif" font-size="9" fill="#ef4444">Date of Expiry: 20 Oct 2032</text>
+
+    <!-- Official Stamp Mark -->
+    <circle cx="480" cy="25" r="18" fill="none" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="2 2" />
+    <text x="480" y="28" font-family="sans-serif" font-size="7" font-weight="bold" fill="#0284c7" text-anchor="middle">OFFICIAL</text>
+  </g>
+</svg>

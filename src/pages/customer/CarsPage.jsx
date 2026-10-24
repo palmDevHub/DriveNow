@@ -75,8 +75,6 @@ export const CarsPage = () => {
         </div>
       </div>
 
-      {/* Filter Component */}
-      <CarFilter />
 
       {/* Cars Grid */}
       {sortedCars.length > 0 ? (

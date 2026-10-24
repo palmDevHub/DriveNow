@@ -8,7 +8,17 @@ export const AppProvider = ({ children }) => {
   // Load initial state from LocalStorage or default mock data
   const [users, setUsers] = useState(() => {
     const saved = localStorage.getItem('drivenow_users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasUser = parsed.some(u => (u.username && u.username.toLowerCase() === 'user') || (u.email && u.email.toLowerCase() === 'user@drivenow.com'));
+        const hasAdmin = parsed.some(u => (u.username && (u.username.toLowerCase() === 'andmin' || u.username.toLowerCase() === 'admin')) || (u.email && u.email.toLowerCase() === 'andmin@drivenow.com'));
+        if (hasUser && hasAdmin) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_USERS;
   });
 
   const [cars, setCars] = useState(() => {
@@ -175,11 +185,107 @@ export const AppProvider = ({ children }) => {
     }, 4000);
   };
 
-  // Auth Operations
-  const login = (email, password) => {
-    const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  // Backend API Base URL
+  const API_BASE = 'http://localhost:5000/api';
+
+  // Automatically sync with Backend API on mount & auth change (Graceful degradation if offline)
+  useEffect(() => {
+    const syncBackendData = async () => {
+      try {
+        // 1. Fetch Cars from MySQL
+        const carsRes = await fetch(`${API_BASE}/cars`);
+        if (carsRes.ok) {
+          const carsData = await carsRes.json();
+          if (Array.isArray(carsData) && carsData.length > 0) {
+            setCars(carsData);
+          }
+        }
+
+        // 2. Fetch authenticated session & Bookings if user logged in
+        if (currentUser) {
+          const bookingsRes = await fetch(`${API_BASE}/bookings`, { credentials: 'include' });
+          if (bookingsRes.ok) {
+            const bookingsData = await bookingsRes.json();
+            if (Array.isArray(bookingsData)) {
+              setBookings(bookingsData);
+            }
+          }
+
+          // 3. Fetch Users from MySQL if Admin
+          if (currentUser.role === 'admin') {
+            const usersRes = await fetch(`${API_BASE}/users`, { credentials: 'include' });
+            if (usersRes.ok) {
+              const usersData = await usersRes.json();
+              if (Array.isArray(usersData) && usersData.length > 0) {
+                setUsers(usersData);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // Fallback to local storage if backend is not running - application never crashes!
+        console.log('App running with local state / offline fallback:', err.message);
+      }
+    };
+
+    syncBackendData();
+  }, [currentUser]);
+
+  // Auth Operations (with Backend API + JWT HttpOnly Cookie + Client Fallback)
+  const login = async (identifier, password) => {
+    const cleanId = (identifier || '').trim();
+    const cleanPass = (password || '').trim();
+
+    // 1. Try Backend API first (with HttpOnly Cookie)
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: cleanId, password: cleanPass }),
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        setCurrentUser(data.user);
+        showToast(data.message || `ยินดีต้อนรับเข้าสู่ระบบคุณ ${data.user.name}`, 'success');
+        if (data.user.role === 'admin') {
+          setCurrentView('admin-dashboard');
+        } else {
+          setCurrentView('home');
+        }
+        return { success: true };
+      } else if (!res.ok) {
+        return { success: false, message: data.message || 'รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง' };
+      }
+    } catch (netErr) {
+      console.warn('Backend unavailable, using local authentication fallback:', netErr.message);
+    }
+
+    // 2. Local Fallback authentication
+    const cleanLowerId = cleanId.toLowerCase();
+    let foundUser = users.find(u => 
+      (u.username && u.username.toLowerCase() === cleanLowerId) ||
+      (u.email && u.email.toLowerCase() === cleanLowerId) ||
+      (u.name && u.name.toLowerCase() === cleanLowerId)
+    );
+
+    if (!foundUser) {
+      if (cleanLowerId === 'user') {
+        foundUser = INITIAL_USERS.find(u => u.username === 'User') || INITIAL_USERS[0];
+      } else if (cleanLowerId === 'andmin' || cleanLowerId === 'admin') {
+        foundUser = INITIAL_USERS.find(u => u.username === 'andmin') || INITIAL_USERS[1];
+      }
+    }
+
     if (foundUser) {
-      if (foundUser.password === password || password === '123456' || password === 'password123' || password === 'adminpassword') {
+      const isPasswordValid = 
+        cleanPass === foundUser.password || 
+        cleanPass === '1234' || 
+        cleanPass === 'password123' || 
+        cleanPass === 'adminpassword';
+
+      if (isPasswordValid) {
         setCurrentUser(foundUser);
         showToast(`ยินดีต้อนรับเข้าสู่ระบบคุณ ${foundUser.name}`, 'success');
         if (foundUser.role === 'admin') {
@@ -189,10 +295,10 @@ export const AppProvider = ({ children }) => {
         }
         return { success: true };
       } else {
-        return { success: false, message: 'รหัสผ่านไม่ถูกต้อง' };
+        return { success: false, message: 'รหัสผ่านไม่ถูกต้อง (รหัสผ่านคือ 1234)' };
       }
     }
-    return { success: false, message: 'ไม่พบบัญชีผู้ใช้นี้ในระบบ' };
+    return { success: false, message: 'ไม่พบบัญชีผู้ใช้นี้ในระบบ (กรุณาใช้ User หรือ andmin)' };
   };
 
   const loginWithGoogle = () => {
@@ -215,7 +321,31 @@ export const AppProvider = ({ children }) => {
     setCurrentView('home');
   };
 
-  const register = (userData) => {
+  const register = async (userData) => {
+    // 1. Try Backend API first (hashes password with bcryptjs + sets HttpOnly cookie)
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        setUsers(prev => [data.user, ...prev]);
+        setCurrentUser(data.user);
+        showToast('สมัครสมาชิกและเข้าสู่ระบบเรียบร้อยแล้ว!', 'success');
+        setCurrentView('home');
+        return { success: true };
+      } else if (!res.ok) {
+        return { success: false, message: data.message || 'การสมัครสมาชิกล้มเหลว' };
+      }
+    } catch (netErr) {
+      console.warn('Backend unavailable, using local register fallback:', netErr.message);
+    }
+
+    // 2. Local Fallback register
     const existing = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
     if (existing) {
       return { success: false, message: 'อีเมลนี้ถูกใช้งานแล้วในระบบ' };
@@ -238,8 +368,16 @@ export const AppProvider = ({ children }) => {
     return { success: true };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {}
+
     setCurrentUser(null);
+    localStorage.removeItem('drivenow_current_user');
     showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
     setCurrentView('home');
   };
@@ -258,8 +396,25 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Car CRUD Operations (Admin & App)
-  const addCar = (newCarData) => {
+  // ============================================================
+  // CRUD Operations Table 1: CARS (Create, Read, Update, Delete)
+  // ============================================================
+  const addCar = async (newCarData) => {
+    try {
+      const res = await fetch(`${API_BASE}/cars`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCarData),
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCars(prev => [data.car, ...prev]);
+        showToast(`เพิ่มข้อมูลรถ ${newCarData.brand} ${newCarData.model} เรียบร้อยแล้ว`, 'success');
+        return;
+      }
+    } catch (e) {}
+
     const carId = `CAR-00${cars.length + 1}`;
     const carObj = {
       car_id: carId,
@@ -270,23 +425,41 @@ export const AppProvider = ({ children }) => {
     showToast(`เพิ่มข้อมูลรถ ${carObj.brand} ${carObj.model} เรียบร้อยแล้ว`, 'success');
   };
 
-  const updateCar = (carId, updatedData) => {
+  const updateCar = async (carId, updatedData) => {
+    try {
+      await fetch(`${API_BASE}/cars/${carId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData),
+        credentials: 'include'
+      });
+    } catch (e) {}
+
     setCars(prev => prev.map(car => car.car_id === carId ? { ...car, ...updatedData } : car));
     showToast('อัปเดตข้อมูลรถเรียบร้อยแล้ว', 'success');
   };
 
-  const deleteCar = (carId) => {
+  const deleteCar = async (carId) => {
+    try {
+      await fetch(`${API_BASE}/cars/${carId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+    } catch (e) {}
+
     setCars(prev => prev.filter(car => car.car_id !== carId));
     showToast('ลบข้อมูลรถเรียบร้อยแล้ว', 'warning');
   };
 
   const toggleCarStatus = (carId, newStatus) => {
-    setCars(prev => prev.map(car => car.car_id === carId ? { ...car, status: newStatus } : car));
+    updateCar(carId, { status: newStatus });
     showToast(`เปลี่ยนสถานะรถเป็น "${newStatus}"`, 'info');
   };
 
-  // Booking Operations
-  const createBooking = (bookingDetails) => {
+  // ============================================================
+  // CRUD Operations Table 2: BOOKINGS (Create, Read, Update, Delete)
+  // ============================================================
+  const createBooking = async (bookingDetails) => {
     const bookingId = `BK-${Date.now().toString().slice(-8)}`;
     const newBooking = {
       booking_id: bookingId,
@@ -303,11 +476,22 @@ export const AppProvider = ({ children }) => {
       total_days: bookingDetails.totalDays,
       price_per_day: bookingDetails.car.price_per_day,
       total_price: bookingDetails.totalPrice,
-      status: 'รอยืนยัน', // Default status when slip is uploaded
+      status: 'รอยืนยัน',
       created_at: new Date().toLocaleString('th-TH'),
       payment_method: bookingDetails.paymentMethod || 'โอนเงิน (PromptPay/Bank Transfer)',
-      payment_slip: bookingDetails.paymentSlip || 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=500&q=80'
+      payment_slip: bookingDetails.paymentSlip || '/demo-payment-slip.svg',
+      id_card_image: bookingDetails.idCardImage || '/demo-id-card.svg',
+      driver_license_image: bookingDetails.driverLicenseImage || '/demo-driver-license.svg'
     };
+
+    try {
+      await fetch(`${API_BASE}/bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBooking),
+        credentials: 'include'
+      });
+    } catch (e) {}
 
     setBookings(prev => [newBooking, ...prev]);
 
@@ -329,10 +513,18 @@ export const AppProvider = ({ children }) => {
     return newBooking;
   };
 
-  const updateBookingStatus = (bookingId, newStatus) => {
+  const updateBookingStatus = async (bookingId, newStatus) => {
+    try {
+      await fetch(`${API_BASE}/bookings/${bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include'
+      });
+    } catch (e) {}
+
     setBookings(prev => prev.map(b => {
       if (b.booking_id === bookingId) {
-        // Also update corresponding car status if completed or cancelled
         if (newStatus === 'คืนรถแล้ว' || newStatus === 'ยกเลิก') {
           setCars(carsPrev => carsPrev.map(c => c.car_id === b.car_id ? { ...c, status: 'ว่าง' } : c));
         } else if (newStatus === 'กำลังใช้งาน') {
@@ -345,8 +537,92 @@ export const AppProvider = ({ children }) => {
     showToast(`อัปเดตสถานะการจองเป็น "${newStatus}"`, 'info');
   };
 
+  const deleteBooking = async (bookingId) => {
+    try {
+      await fetch(`${API_BASE}/bookings/${bookingId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+    } catch (e) {}
+
+    setBookings(prev => prev.filter(b => b.booking_id !== bookingId));
+    showToast('ลบรายการจองเรียบร้อยแล้ว', 'warning');
+  };
+
   const cancelBooking = (bookingId) => {
     updateBookingStatus(bookingId, 'ยกเลิก');
+  };
+
+  // ============================================================
+  // CRUD Operations Table 3: USERS (Create, Read, Update, Delete)
+  // ============================================================
+  const addUser = async (userData) => {
+    try {
+      const res = await fetch(`${API_BASE}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(prev => [data.user, ...prev]);
+        showToast('เพิ่มผู้ใช้งานสำเร็จ!', 'success');
+        return { success: true };
+      } else {
+        const errData = await res.json();
+        showToast(errData.message || 'ไม่สามารถเพิ่มผู้ใช้ได้', 'error');
+        return { success: false, message: errData.message };
+      }
+    } catch (e) {}
+
+    const newUser = {
+      user_id: `USR-${Date.now().toString().slice(-6)}`,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone || '080-000-0000',
+      role: userData.role || 'customer',
+      id_card: userData.id_card || null,
+      driver_license: userData.driver_license || null,
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+      created_at: new Date().toISOString().split('T')[0]
+    };
+
+    setUsers(prev => [newUser, ...prev]);
+    showToast('เพิ่มผู้ใช้งานสำเร็จ!', 'success');
+    return { success: true };
+  };
+
+  const updateUser = async (userId, userData) => {
+    try {
+      await fetch(`${API_BASE}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+        credentials: 'include'
+      });
+    } catch (e) {}
+
+    setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, ...userData } : u));
+    showToast('อัปเดตข้อมูลผู้ใช้งานเรียบร้อยแล้ว', 'success');
+  };
+
+  const deleteUser = async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE}/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.message || 'ไม่สามารถลบผู้ใช้งานได้', 'error');
+        return;
+      }
+    } catch (e) {}
+
+    setUsers(prev => prev.filter(u => u.user_id !== userId));
+    showToast('ลบผู้ใช้งานเรียบร้อยแล้ว', 'warning');
   };
 
   // Select car and open booking checkout flow
@@ -417,7 +693,11 @@ export const AppProvider = ({ children }) => {
       toggleCarStatus,
       createBooking,
       updateBookingStatus,
+      deleteBooking,
       cancelBooking,
+      addUser,
+      updateUser,
+      deleteUser,
       handleSelectCarForBooking,
       submitReview,
       sendChatMessage,
@@ -430,3 +710,4 @@ export const AppProvider = ({ children }) => {
 };
 
 export const useApp = () => useContext(AppContext);
+

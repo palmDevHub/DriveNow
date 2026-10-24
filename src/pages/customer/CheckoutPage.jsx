@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatTHB, formatDate } from '../../utils/formatters';
 import { 
@@ -30,6 +30,10 @@ export const CheckoutPage = () => {
   // Step state: 1 = Form & Confirmation, 2 = Payment & Slip, 3 = Complete Success
   const [step, setStep] = useState(1);
 
+  const slipInputRef = useRef(null);
+  const idCardInputRef = useRef(null);
+  const driverLicenseInputRef = useRef(null);
+
   // Scroll to top automatically whenever step changes (especially step 3 after booking completion)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -42,10 +46,36 @@ export const CheckoutPage = () => {
     customerPhone: currentUser ? currentUser.phone : '081-234-5678',
     driverLicense: currentUser ? (currentUser.driver_license || 'DL-99182347') : 'DL-99182347',
     paymentMethod: isEn ? 'Bank Transfer (PromptPay / QR Code)' : 'โอนเงิน (PromptPay / QR Code)',
-    paymentSlip: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=500&q=80',
+    paymentSlip: '/demo-payment-slip.svg',
     idCardImage: '',
     driverLicenseImage: ''
   });
+
+  const handleImageFileChange = (field, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast(isEn ? 'Please choose an image file (PNG, JPG, WebP)' : 'กรุณาเลือกไฟล์รูปภาพ (PNG, JPG, WebP)', 'warning');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast(isEn ? 'File size exceeds 5MB limit' : 'ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่', 'warning');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: event.target.result
+      }));
+      showToast(isEn ? 'Uploaded successfully' : 'อัปโหลดรูปภาพสำเร็จ', 'success');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const [createdBookingResult, setCreatedBookingResult] = useState(null);
 
@@ -338,34 +368,78 @@ export const CheckoutPage = () => {
                 <Upload className="w-4 h-4 text-blue-500" /> {t.attachSlipTitle}
               </h3>
 
+              <input
+                type="file"
+                ref={slipInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageFileChange('paymentSlip', e)}
+              />
+
               <div className="bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-700 text-center space-y-3">
                 {formData.paymentSlip ? (
-                  <div className="space-y-2">
-                    <img src={formData.paymentSlip} alt="Payment Slip Preview" className="h-36 mx-auto rounded-xl border border-slate-800 object-cover" />
+                  <div className="space-y-2 relative group">
+                    <img 
+                      src={formData.paymentSlip} 
+                      alt="Payment Slip Preview" 
+                      className="h-36 mx-auto rounded-xl border border-slate-800 object-cover shadow-md"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/demo-payment-slip.svg';
+                      }}
+                    />
                     <p className="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1">
                       <CheckCircle2 className="w-4 h-4" /> {t.slipAttachedSuccess}
                     </p>
+                    <div className="flex justify-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => slipInputRef.current?.click()}
+                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-medium transition flex items-center gap-1"
+                      >
+                        <Upload className="w-3 h-3" /> {isEn ? 'Change Slip' : 'เปลี่ยนรูปสลิป'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, paymentSlip: '' }))}
+                        className="px-3 py-1 bg-red-950/60 hover:bg-red-900/80 text-red-300 rounded-lg text-[11px] font-medium transition flex items-center gap-1 border border-red-900/50"
+                      >
+                        <X className="w-3 h-3" /> {isEn ? 'Remove' : 'ลบรูป'}
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    <Upload className="w-8 h-8 text-slate-500 mx-auto" />
-                    <p className="text-xs text-slate-300">{t.clickUploadSlip}</p>
-                    <p className="text-[10px] text-slate-500">JPG, PNG (max 5MB)</p>
+                  <div className="space-y-2 py-2">
+                    <div 
+                      onClick={() => slipInputRef.current?.click()}
+                      className="cursor-pointer space-y-1 hover:opacity-80 transition py-1"
+                    >
+                      <Upload className="w-8 h-8 text-slate-500 mx-auto" />
+                      <p className="text-xs text-slate-300 font-medium">{t.clickUploadSlip}</p>
+                      <p className="text-[10px] text-slate-500">JPG, PNG (max 5MB)</p>
+                    </div>
+
+                    <div className="flex justify-center gap-2 pt-1 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => slipInputRef.current?.click()}
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-medium transition flex items-center gap-1"
+                      >
+                        <Upload className="w-3 h-3" /> {isEn ? 'Upload Slip' : 'เลือกไฟล์สลิป'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          paymentSlip: '/demo-payment-slip.svg'
+                        }))}
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-medium transition"
+                      >
+                        {t.demoSlipBtn}
+                      </button>
+                    </div>
                   </div>
                 )}
-
-                <div className="flex justify-center gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({
-                      ...formData,
-                      paymentSlip: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=500&q=80'
-                    })}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-medium"
-                  >
-                    {t.demoSlipBtn}
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -375,63 +449,152 @@ export const CheckoutPage = () => {
                 <ShieldCheck className="w-4 h-4 text-blue-500" /> {isEn ? 'Identity Verification' : 'ยืนยันตัวตน'}
               </h3>
               
+              <input
+                type="file"
+                ref={idCardInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageFileChange('idCardImage', e)}
+              />
+              <input
+                type="file"
+                ref={driverLicenseInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageFileChange('driverLicenseImage', e)}
+              />
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* ID Card Front */}
                 <div className="bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-700 text-center space-y-3 relative group">
                   {formData.idCardImage ? (
                     <div className="space-y-2 relative">
-                       <img src={formData.idCardImage} alt="ID Card" className="h-28 w-full object-cover rounded-xl border border-slate-800" />
+                       <img 
+                         src={formData.idCardImage} 
+                         alt="ID Card" 
+                         className="h-28 w-full object-cover rounded-xl border border-slate-800 shadow-md bg-slate-900" 
+                         onError={(e) => {
+                           e.currentTarget.onerror = null;
+                           e.currentTarget.src = '/demo-id-card.svg';
+                         }}
+                       />
                        <button
-                         onClick={() => setFormData({ ...formData, idCardImage: '' })}
+                         type="button"
+                         onClick={() => setFormData(prev => ({ ...prev, idCardImage: '' }))}
                          className="absolute top-2 right-2 bg-blue-600 p-1.5 rounded-full text-white shadow-lg hover:bg-blue-700 transition"
+                         title={isEn ? 'Remove' : 'ลบรูป'}
                        >
                          <X className="w-3 h-3" />
                        </button>
+                       <div className="flex justify-between items-center px-1 text-[11px]">
+                         <span className="text-emerald-400 font-medium flex items-center gap-1">
+                           <CheckCircle2 className="w-3.5 h-3.5" /> {isEn ? 'ID Card Attached' : 'แนบบัตรประชาชนแล้ว'}
+                         </span>
+                         <button
+                           type="button"
+                           onClick={() => idCardInputRef.current?.click()}
+                           className="text-slate-400 hover:text-white underline text-[10px]"
+                         >
+                           {isEn ? 'Change' : 'เปลี่ยนรูป'}
+                         </button>
+                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-1 py-4">
-                      <FileCheck className="w-6 h-6 text-slate-500 mx-auto" />
-                      <p className="text-xs text-slate-300">{isEn ? 'Front of ID Card' : 'รูปบัตรประชาชนด้านหน้า'}</p>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({
-                          ...formData,
-                          idCardImage: 'https://images.unsplash.com/photo-1633265486064-086b219458ce?auto=format&fit=crop&w=500&q=80'
-                        })}
-                        className="mt-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-medium transition"
+                    <div className="space-y-2 py-2">
+                      <div 
+                        onClick={() => idCardInputRef.current?.click()}
+                        className="cursor-pointer space-y-1 hover:opacity-80 transition py-1"
                       >
-                        {isEn ? 'Upload Demo ID' : 'ใช้รูปตัวอย่าง (Demo)'}
-                      </button>
+                        <FileCheck className="w-6 h-6 text-slate-500 mx-auto" />
+                        <p className="text-xs text-slate-300 font-medium">{isEn ? 'Front of ID Card' : 'รูปบัตรประชาชนด้านหน้า'}</p>
+                        <p className="text-[10px] text-slate-500">JPG, PNG (max 5MB)</p>
+                      </div>
+                      <div className="flex justify-center gap-2 pt-1 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => idCardInputRef.current?.click()}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-medium transition flex items-center gap-1"
+                        >
+                          <Upload className="w-3 h-3" /> {isEn ? 'Upload File' : 'เลือกรูปภาพ'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({
+                            ...prev,
+                            idCardImage: '/demo-id-card.svg'
+                          }))}
+                          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-medium transition"
+                        >
+                          {isEn ? 'Use Demo ID' : 'ใช้รูปตัวอย่าง (Demo)'}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Driver's License Front */}
-                <div className="bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-700 text-center space-y-3">
+                <div className="bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-700 text-center space-y-3 relative group">
                   {formData.driverLicenseImage ? (
                     <div className="space-y-2 relative">
-                       <img src={formData.driverLicenseImage} alt="Driver's License" className="h-28 w-full object-cover rounded-xl border border-slate-800" />
+                       <img 
+                         src={formData.driverLicenseImage} 
+                         alt="Driver's License" 
+                         className="h-28 w-full object-cover rounded-xl border border-slate-800 shadow-md bg-slate-900" 
+                         onError={(e) => {
+                           e.currentTarget.onerror = null;
+                           e.currentTarget.src = '/demo-driver-license.svg';
+                         }}
+                       />
                        <button
-                         onClick={() => setFormData({ ...formData, driverLicenseImage: '' })}
+                         type="button"
+                         onClick={() => setFormData(prev => ({ ...prev, driverLicenseImage: '' }))}
                          className="absolute top-2 right-2 bg-blue-600 p-1.5 rounded-full text-white shadow-lg hover:bg-blue-700 transition"
+                         title={isEn ? 'Remove' : 'ลบรูป'}
                        >
                          <X className="w-3 h-3" />
                        </button>
+                       <div className="flex justify-between items-center px-1 text-[11px]">
+                         <span className="text-emerald-400 font-medium flex items-center gap-1">
+                           <CheckCircle2 className="w-3.5 h-3.5" /> {isEn ? 'License Attached' : 'แนบใบขับขี่แล้ว'}
+                         </span>
+                         <button
+                           type="button"
+                           onClick={() => driverLicenseInputRef.current?.click()}
+                           className="text-slate-400 hover:text-white underline text-[10px]"
+                         >
+                           {isEn ? 'Change' : 'เปลี่ยนรูป'}
+                         </button>
+                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-1 py-4">
-                      <CreditCard className="w-6 h-6 text-slate-500 mx-auto" />
-                      <p className="text-xs text-slate-300">{isEn ? "Front of Driver's License" : 'รูปใบขับขี่ด้านหน้า'}</p>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({
-                          ...formData,
-                          driverLicenseImage: 'https://images.unsplash.com/photo-1589149098258-3e9102cd63d3?auto=format&fit=crop&w=500&q=80'
-                        })}
-                        className="mt-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-medium transition"
+                    <div className="space-y-2 py-2">
+                      <div 
+                        onClick={() => driverLicenseInputRef.current?.click()}
+                        className="cursor-pointer space-y-1 hover:opacity-80 transition py-1"
                       >
-                        {isEn ? 'Upload Demo License' : 'ใช้รูปตัวอย่าง (Demo)'}
-                      </button>
+                        <CreditCard className="w-6 h-6 text-slate-500 mx-auto" />
+                        <p className="text-xs text-slate-300 font-medium">{isEn ? "Front of Driver's License" : 'รูปใบขับขี่ด้านหน้า'}</p>
+                        <p className="text-[10px] text-slate-500">JPG, PNG (max 5MB)</p>
+                      </div>
+                      <div className="flex justify-center gap-2 pt-1 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => driverLicenseInputRef.current?.click()}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-medium transition flex items-center gap-1"
+                        >
+                          <Upload className="w-3 h-3" /> {isEn ? 'Upload File' : 'เลือกรูปภาพ'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({
+                            ...prev,
+                            driverLicenseImage: '/demo-driver-license.svg'
+                          }))}
+                          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-medium transition"
+                        >
+                          {isEn ? 'Use Demo License' : 'ใช้รูปตัวอย่าง (Demo)'}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

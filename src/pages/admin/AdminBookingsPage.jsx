@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatTHB, formatThaiDate, getBookingStatusBadge } from '../../utils/formatters';
-import { Calendar, Eye, CheckCircle, Clock, XCircle, Search, FileText } from 'lucide-react';
+import { Calendar, Eye, CheckCircle, Clock, XCircle, Search, FileText, Trash2 } from 'lucide-react';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 export const AdminBookingsPage = () => {
-  const { bookings, updateBookingStatus, t, language } = useApp();
+  const { bookings, updateBookingStatus, deleteBooking, t, language } = useApp();
   const isEn = language === 'en';
   const [statusFilter, setStatusFilter] = useState('ทั้งหมด');
   const [keyword, setKeyword] = useState('');
   const [viewSlipModal, setViewSlipModal] = useState(null);
+  const [bookingToDelete, setBookingToDelete] = useState(null);
 
   const filteredBookings = bookings.filter(b => {
     if (statusFilter !== 'ทั้งหมด' && statusFilter !== 'All' && b.status !== statusFilter) return false;
@@ -136,18 +138,28 @@ export const AdminBookingsPage = () => {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <select
-                        value={b.status}
-                        onChange={(e) => updateBookingStatus(b.booking_id, e.target.value)}
-                        className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-white rounded-lg text-xs focus:border-blue-500 focus:outline-none cursor-pointer font-medium"
-                      >
-                        <option value="รอชำระเงิน">{isEn ? 'Pending Payment' : 'รอชำระเงิน'}</option>
-                        <option value="รอยืนยัน">{isEn ? 'Pending Slip Verification' : 'รอยืนยันสลิป'}</option>
-                        <option value="ยืนยันแล้ว">{isEn ? 'Approved' : 'อนุมัติ (ยืนยันแล้ว)'}</option>
-                        <option value="กำลังใช้งาน">{isEn ? 'In Use' : 'กำลังใช้งานรถ'}</option>
-                        <option value="คืนรถแล้ว">{isEn ? 'Returned' : 'คืนรถเรียบร้อยแล้ว'}</option>
-                        <option value="ยกเลิก">{isEn ? 'Cancelled' : 'ยกเลิกการจอง'}</option>
-                      </select>
+                      <div className="flex items-center justify-end gap-2">
+                        <select
+                          value={b.status}
+                          onChange={(e) => updateBookingStatus(b.booking_id, e.target.value)}
+                          className="px-2.5 py-1.5 bg-slate-950 border border-slate-800 text-white rounded-lg text-xs focus:border-blue-500 focus:outline-none cursor-pointer font-medium"
+                        >
+                          <option value="รอชำระเงิน">{isEn ? 'Pending Payment' : 'รอชำระเงิน'}</option>
+                          <option value="รอยืนยัน">{isEn ? 'Pending Slip Verification' : 'รอยืนยันสลิป'}</option>
+                          <option value="ยืนยันแล้ว">{isEn ? 'Approved' : 'อนุมัติ (ยืนยันแล้ว)'}</option>
+                          <option value="กำลังใช้งาน">{isEn ? 'In Use' : 'กำลังใช้งานรถ'}</option>
+                          <option value="คืนรถแล้ว">{isEn ? 'Returned' : 'คืนรถเรียบร้อยแล้ว'}</option>
+                          <option value="ยกเลิก">{isEn ? 'Cancelled' : 'ยกเลิกการจอง'}</option>
+                        </select>
+
+                        <button
+                          onClick={() => setBookingToDelete(b)}
+                          className="p-1.5 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-400 rounded-lg transition"
+                          title={isEn ? 'Delete Booking' : 'ลบรายการจองนี้'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -172,11 +184,47 @@ export const AdminBookingsPage = () => {
               <p className="text-slate-300">{t.totalPriceLabel}: <strong className="text-blue-500 text-sm font-bold">{formatTHB(viewSlipModal.total_price, language)}</strong></p>
             </div>
 
-            <img
-              src={viewSlipModal.payment_slip}
-              alt="Slip"
-              className="w-full h-80 object-cover rounded-2xl border border-slate-800"
-            />
+            <div className="space-y-3">
+              <img
+                src={viewSlipModal.payment_slip || '/demo-payment-slip.svg'}
+                alt="Slip"
+                className="w-full h-64 object-cover rounded-2xl border border-slate-800"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/demo-payment-slip.svg';
+                }}
+              />
+            </div>
+
+            {(viewSlipModal.id_card_image || viewSlipModal.driver_license_image) && (
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <p className="text-[11px] font-bold text-slate-300">{isEn ? 'Identity Documents:' : 'เอกสารยืนยันตัวตน:'}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {viewSlipModal.id_card_image && (
+                    <div>
+                      <span className="text-[10px] text-slate-400 block mb-1">{isEn ? 'ID Card' : 'บัตรประชาชน'}</span>
+                      <img 
+                        src={viewSlipModal.id_card_image} 
+                        alt="ID Card" 
+                        className="w-full h-24 object-cover rounded-xl border border-slate-800" 
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/demo-id-card.svg'; }}
+                      />
+                    </div>
+                  )}
+                  {viewSlipModal.driver_license_image && (
+                    <div>
+                      <span className="text-[10px] text-slate-400 block mb-1">{isEn ? 'Driver License' : 'ใบขับขี่'}</span>
+                      <img 
+                        src={viewSlipModal.driver_license_image} 
+                        alt="Driver License" 
+                        className="w-full h-24 object-cover rounded-xl border border-slate-800" 
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/demo-driver-license.svg'; }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2 pt-2">
               <button
@@ -192,6 +240,24 @@ export const AdminBookingsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialog for Deleting Booking */}
+      <ConfirmModal
+        isOpen={!!bookingToDelete}
+        title={isEn ? 'Delete Booking' : 'ยืนยันการลบรายการจอง'}
+        message={bookingToDelete ? (isEn ? `Are you sure you want to delete booking ${bookingToDelete.booking_id} for ${bookingToDelete.user_name}? This action cannot be undone.` : `คุณแน่ใจหรือไม่ว่าต้องการลบรายการจอง ${bookingToDelete.booking_id} ของคุณ ${bookingToDelete.user_name}? ข้อมูลที่ลบจะไม่สามารถกู้คืนได้`) : ''}
+        confirmText={isEn ? 'Delete Booking' : 'ยืนยันการลบ'}
+        cancelText={isEn ? 'Cancel' : 'ยกเลิก'}
+        confirmVariant="danger"
+        onConfirm={() => {
+          if (bookingToDelete) {
+            deleteBooking(bookingToDelete.booking_id);
+            setBookingToDelete(null);
+          }
+        }}
+        onClose={() => setBookingToDelete(null)}
+        isEn={isEn}
+      />
 
     </div>
   );

@@ -144,9 +144,25 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Car Rental Songkhla. {isEn ? 'Online Car Rental Portal.' : 'ระบบจองรถเช่าออนไลน์'}</p>
-          <div className="flex gap-4 mt-2 md:mt-0">
-            <span>{isEn ? 'Privacy Policy' : 'นโยบายความเป็นส่วนตัว'}</span>
+          <div className="flex flex-wrap gap-3 mt-2 md:mt-0 items-center">
+            <button 
+              type="button" 
+              onClick={() => window.dispatchEvent(new CustomEvent('open_cookie_settings'))}
+              className="hover:text-blue-400 transition underline underline-offset-2"
+            >
+              {isEn ? 'Cookie Settings' : 'ตั้งค่าคุกกี้ (PDPA)'}
+            </button>
+            <span>•</span>
+            <button 
+              type="button" 
+              onClick={() => window.dispatchEvent(new CustomEvent('open_cookie_settings'))}
+              className="hover:text-blue-400 transition"
+            >
+              {isEn ? 'Privacy Policy' : 'นโยบายความเป็นส่วนตัว'}
+            </button>
+            <span>•</span>
             <span>{isEn ? 'Terms & Conditions' : 'ข้อกำหนดและเงื่อนไข'}</span>
+            <span>•</span>
             <span>{isEn ? 'Help & FAQ' : 'ความช่วยเหลือ'}</span>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatTHB, getCarStatusBadge } from '../../utils/formatters';
 import { Car, Plus, Edit, Trash2, Search, X, Check, SlidersHorizontal, AlertCircle } from 'lucide-react';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 export const AdminCarsPage = () => {
   const { cars, addCar, updateCar, deleteCar, toggleCarStatus, t, language } = useApp();
@@ -13,6 +14,7 @@ export const AdminCarsPage = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
+  const [carToDelete, setCarToDelete] = useState(null);
 
   const [formState, setFormState] = useState({
     brand: 'Toyota',
@@ -204,14 +206,7 @@ export const AdminCarsPage = () => {
                           <Edit className="w-4 h-4 text-blue-400" />
                         </button>
                         <button
-                          onClick={() => {
-                            const confirmMsg = isEn 
-                              ? `Are you sure you want to delete ${car.brand} ${car.model}?`
-                              : `คุณต้องการลบข้อมูลรถ ${car.brand} ${car.model} ใช่หรือไม่?`;
-                            if (window.confirm(confirmMsg)) {
-                              deleteCar(car.car_id);
-                            }
-                          }}
+                          onClick={() => setCarToDelete(car)}
                           className="p-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-400 rounded-xl"
                           title={isEn ? 'Delete Car' : 'ลบรถคันนี้'}
                         >
@@ -388,6 +383,24 @@ export const AdminCarsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialog for Deleting Car */}
+      <ConfirmModal
+        isOpen={!!carToDelete}
+        title={isEn ? 'Delete Vehicle' : 'ยืนยันการลบข้อมูลรถ'}
+        message={carToDelete ? (isEn ? `Are you sure you want to delete ${carToDelete.brand} ${carToDelete.model} (${carToDelete.car_id})? This action cannot be undone.` : `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลรถ ${carToDelete.brand} ${carToDelete.model} (${carToDelete.car_id})? เมื่อลบแล้วจะไม่สามารถกู้คืนได้`) : ''}
+        confirmText={isEn ? 'Delete' : 'ยืนยันลบข้อมูล'}
+        cancelText={isEn ? 'Cancel' : 'ยกเลิก'}
+        confirmVariant="danger"
+        onConfirm={() => {
+          if (carToDelete) {
+            deleteCar(carToDelete.car_id);
+            setCarToDelete(null);
+          }
+        }}
+        onClose={() => setCarToDelete(null)}
+        isEn={isEn}
+      />
 
     </div>
   );
