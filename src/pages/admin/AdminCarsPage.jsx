@@ -188,7 +188,7 @@ export const AdminCarsPage = () => {
                       <select
                         value={car.status}
                         onChange={(e) => toggleCarStatus(car.car_id, e.target.value)}
-                        className={`px-3 py-1 text-xs font-bold rounded-full border bg-slate-950 focus:outline-none cursor-pointer ${badge.color} ${badge.border}`}
+                        className={`px-3 py-1 text-xs font-bold rounded-full border bg-slate-950 focus:outline-none cursor-pointer ${badge.adminColor || badge.color} ${badge.border}`}
                       >
                         <option value="ว่าง">{isEn ? 'Available' : 'ว่าง (Available)'}</option>
                         <option value="ถูกจอง">{isEn ? 'Reserved' : 'ถูกจอง (Reserved)'}</option>

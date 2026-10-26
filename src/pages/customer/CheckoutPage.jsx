@@ -47,8 +47,8 @@ export const CheckoutPage = () => {
     driverLicense: currentUser ? (currentUser.driver_license || 'DL-99182347') : 'DL-99182347',
     paymentMethod: isEn ? 'Bank Transfer (PromptPay / QR Code)' : 'โอนเงิน (PromptPay / QR Code)',
     paymentSlip: '/demo-payment-slip.svg',
-    idCardImage: '',
-    driverLicenseImage: ''
+    idCardImage: '/demo-id-card.svg',
+    driverLicenseImage: '/demo-driver-license.svg'
   });
 
   const handleImageFileChange = (field, e) => {
@@ -112,29 +112,40 @@ export const CheckoutPage = () => {
     setStep(2);
   };
 
-  const handleFinalSubmitPayment = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFinalSubmitPayment = async () => {
     if (!formData.paymentSlip || !formData.idCardImage || !formData.driverLicenseImage) {
       showToast(isEn ? 'Please upload all required documents (Slip, ID Card, Driver License)' : 'กรุณาอัปโหลดเอกสารให้ครบถ้วน (สลิป, บัตรประชาชน, ใบขับขี่)', 'warning');
       return;
     }
 
-    const newBooking = createBooking({
-      car: car,
-      startDate: bookingDraft.startDate,
-      endDate: bookingDraft.endDate,
-      totalDays: bookingDraft.totalDays,
-      totalPrice: bookingDraft.totalPrice,
-      customerName: formData.customerName,
-      customerEmail: formData.customerEmail,
-      customerPhone: formData.customerPhone,
-      paymentMethod: formData.paymentMethod,
-      paymentSlip: formData.paymentSlip,
-      idCardImage: formData.idCardImage,
-      driverLicenseImage: formData.driverLicenseImage
-    });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    setCreatedBookingResult(newBooking);
-    setStep(3);
+    try {
+      const newBooking = await createBooking({
+        car: car,
+        startDate: bookingDraft.startDate,
+        endDate: bookingDraft.endDate,
+        totalDays: bookingDraft.totalDays,
+        totalPrice: bookingDraft.totalPrice,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        paymentMethod: formData.paymentMethod,
+        paymentSlip: formData.paymentSlip,
+        idCardImage: formData.idCardImage,
+        driverLicenseImage: formData.driverLicenseImage
+      });
+
+      setCreatedBookingResult(newBooking);
+      setStep(3);
+    } catch (err) {
+      console.error('Booking submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     // Explicitly scroll to top smoothly after completing booking
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -704,10 +715,14 @@ export const CheckoutPage = () => {
                <div className="space-y-4 z-10 text-center sm:text-left">
                   <div className="space-y-1">
                     <span className="text-[10px] uppercase font-bold text-blue-500 tracking-widest">{t.bookingId}</span>
-                    <p className="text-2xl sm:text-3xl font-mono font-bold text-white tracking-wider">{createdBookingResult.booking_id}</p>
+                    <p className="text-2xl sm:text-3xl font-mono font-bold text-white tracking-wider">
+                      {createdBookingResult?.booking_id || `BK-${Date.now().toString().slice(-8)}`}
+                    </p>
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white font-prompt">{createdBookingResult.car_name}</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white font-prompt">
+                      {createdBookingResult?.car_name || `${car.brand} ${car.model}`}
+                    </h3>
                     <p className="text-xs text-slate-400 mt-1">{car.seats} {t.seats} • {car.transmission}</p>
                   </div>
                </div>
@@ -716,25 +731,33 @@ export const CheckoutPage = () => {
              <div className="mt-8 pt-8 border-t-2 border-dashed border-slate-700 grid grid-cols-2 gap-y-6 gap-x-4 text-xs">
                 <div>
                   <span className="block text-[10px] text-slate-500 uppercase font-bold">{t.startDateLabel}</span>
-                  <span className="font-semibold text-white text-sm">{formatDate(createdBookingResult.start_date, language)}</span>
+                  <span className="font-semibold text-white text-sm">
+                    {formatDate(createdBookingResult?.start_date || bookingDraft?.startDate, language)}
+                  </span>
                 </div>
                 <div>
                   <span className="block text-[10px] text-slate-500 uppercase font-bold">{t.endDateLabel}</span>
-                  <span className="font-semibold text-white text-sm">{formatDate(createdBookingResult.end_date, language)}</span>
+                  <span className="font-semibold text-white text-sm">
+                    {formatDate(createdBookingResult?.end_date || bookingDraft?.endDate, language)}
+                  </span>
                 </div>
                 <div>
                   <span className="block text-[10px] text-slate-500 uppercase font-bold">{t.fullNameLabel}</span>
-                  <span className="font-semibold text-white text-sm">{createdBookingResult.user_name}</span>
+                  <span className="font-semibold text-white text-sm">
+                    {createdBookingResult?.user_name || formData.customerName || currentUser?.name || '-'}
+                  </span>
                 </div>
                 <div>
                   <span className="block text-[10px] text-slate-500 uppercase font-bold">{t.totalDueLabel}</span>
-                  <span className="font-extrabold text-emerald-400 text-base">{formatTHB(createdBookingResult.total_price, language)}</span>
+                  <span className="font-extrabold text-emerald-400 text-base">
+                    {formatTHB(createdBookingResult?.total_price ?? bookingDraft?.totalPrice ?? 0, language)}
+                  </span>
                 </div>
              </div>
              
              {/* Status Badge inside pass */}
              <div className="mt-6 flex justify-center sm:justify-start">
-               <span className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-xs rounded-full flex items-center gap-2">
+               <span className="px-4 py-1.5 bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-xs rounded-full flex items-center gap-2">
                  <Clock className="w-4 h-4" /> {isEn ? 'Pending Verification' : 'รอยืนยันสลิปจากแอดมิน'}
                </span>
              </div>

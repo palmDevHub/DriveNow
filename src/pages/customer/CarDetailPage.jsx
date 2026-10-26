@@ -188,10 +188,11 @@ export const CarDetailPage = () => {
 
             {/* Badges */}
             <div className={`absolute top-4 left-4 flex gap-2 transition-opacity duration-300 pointer-events-none z-10 ${zoomedHotspot ? 'opacity-0' : 'opacity-100'}`}>
-              <span className={`px-3 py-1.5 text-xs font-bold rounded-full border backdrop-blur-md ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}>
+              <span className={`px-3.5 py-1.5 text-xs font-bold rounded-full border shadow-md flex items-center gap-1.5 backdrop-blur-md ${statusInfo.badgeClass || `${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot || 'bg-white'} ${car.status === 'ว่าง' || car.status === 'available' ? 'animate-pulse' : ''}`} />
                 {statusInfo.text}
               </span>
-              <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-950/80 text-white border border-slate-700 backdrop-blur-md">
+              <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-950/85 text-white border border-slate-700 backdrop-blur-md shadow-sm">
                 {car.type}
               </span>
             </div>

@@ -20,10 +20,11 @@ export const CarCard = ({ car }) => {
           loading="lazy"
         />
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className={`px-3 py-1 text-xs font-semibold rounded-full border backdrop-blur-md ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}>
+          <span className={`px-3 py-1 text-xs font-bold rounded-full border shadow-md flex items-center gap-1.5 backdrop-blur-md ${statusInfo.badgeClass || `${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot || 'bg-white'} ${isAvailable ? 'animate-pulse' : ''}`} />
             {statusInfo.text}
           </span>
-          <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-950/80 text-slate-300 border border-slate-700/60 backdrop-blur-md">
+          <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-950/85 text-slate-200 border border-slate-700/70 backdrop-blur-md shadow-sm">
             {car.type}
           </span>
         </div>

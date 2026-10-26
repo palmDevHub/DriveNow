@@ -55,18 +55,58 @@ export const getCarStatusBadge = (status, lang = 'th') => {
   switch (status) {
     case 'ว่าง':
     case 'available':
-      return { text: isEn ? 'Available' : 'ว่างพร้อมเช่า', bg: 'bg-emerald-500/10', color: 'text-emerald-400', border: 'border-emerald-500/30' };
+      return { 
+        text: isEn ? 'Available' : 'ว่างพร้อมเช่า', 
+        badgeClass: 'car-status-badge car-status-available',
+        bg: 'bg-emerald-600', 
+        color: 'text-white font-bold', 
+        border: 'border-emerald-400', 
+        adminColor: 'text-emerald-400',
+        dot: 'bg-emerald-200'
+      };
     case 'ถูกจอง':
     case 'reserved':
-      return { text: isEn ? 'Reserved' : 'ถูกจองแล้ว', bg: 'bg-amber-500/10', color: 'text-amber-400', border: 'border-amber-500/30' };
+      return { 
+        text: isEn ? 'Reserved' : 'ถูกจองแล้ว', 
+        badgeClass: 'car-status-badge car-status-reserved',
+        bg: 'bg-amber-500', 
+        color: 'text-slate-950 font-bold', 
+        border: 'border-amber-300', 
+        adminColor: 'text-amber-400',
+        dot: 'bg-slate-900'
+      };
     case 'กำลังเช่า':
     case 'rented':
-      return { text: isEn ? 'Rented' : 'กำลังถูกเช่า', bg: 'bg-blue-500/10', color: 'text-blue-400', border: 'border-blue-500/30' };
+      return { 
+        text: isEn ? 'Rented' : 'กำลังถูกเช่า', 
+        badgeClass: 'car-status-badge car-status-rented',
+        bg: 'bg-blue-600', 
+        color: 'text-white font-bold', 
+        border: 'border-blue-400', 
+        adminColor: 'text-blue-400',
+        dot: 'bg-blue-200'
+      };
     case 'ซ่อม':
     case 'maintenance':
-      return { text: isEn ? 'Maintenance' : 'อยู่ระหว่างซ่อมบำรุง', bg: 'bg-rose-500/10', color: 'text-rose-400', border: 'border-rose-500/30' };
+      return { 
+        text: isEn ? 'Maintenance' : 'อยู่ระหว่างซ่อมบำรุง', 
+        badgeClass: 'car-status-badge car-status-maintenance',
+        bg: 'bg-rose-600', 
+        color: 'text-white font-bold', 
+        border: 'border-rose-400', 
+        adminColor: 'text-rose-400',
+        dot: 'bg-rose-200'
+      };
     default:
-      return { text: status, bg: 'bg-slate-500/10', color: 'text-slate-400', border: 'border-slate-500/30' };
+      return { 
+        text: status, 
+        badgeClass: 'car-status-badge bg-slate-700 text-white border-slate-500',
+        bg: 'bg-slate-700', 
+        color: 'text-white font-bold', 
+        border: 'border-slate-500', 
+        adminColor: 'text-slate-300',
+        dot: 'bg-slate-300'
+      };
   }
 };
 
@@ -74,19 +114,19 @@ export const getBookingStatusBadge = (status, lang = 'th') => {
   const isEn = lang === 'en';
   switch (status) {
     case 'รอชำระเงิน':
-      return { bg: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: isEn ? 'Pending Payment' : 'รอชำระเงิน' };
+      return { bg: 'bg-amber-500/20 text-amber-300 border-amber-500/50 font-semibold', label: isEn ? 'Pending Payment' : 'รอชำระเงิน' };
     case 'รอยืนยัน':
-      return { bg: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30', label: isEn ? 'Pending Slip Verification' : 'รอยืนยันสลิป' };
+      return { bg: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 font-semibold', label: isEn ? 'Pending Slip Verification' : 'รอยืนยันสลิป' };
     case 'ยืนยันแล้ว':
-      return { bg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30', label: isEn ? 'Approved' : 'อนุมัติการจองแล้ว' };
+      return { bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-semibold', label: isEn ? 'Approved' : 'อนุมัติการจองแล้ว' };
     case 'กำลังใช้งาน':
-      return { bg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30', label: isEn ? 'In Use' : 'กำลังใช้งานรถ' };
+      return { bg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 font-semibold', label: isEn ? 'In Use' : 'กำลังใช้งานรถ' };
     case 'คืนรถแล้ว':
     case 'เสร็จสิ้น':
-      return { bg: 'bg-blue-500/15 text-blue-400 border-blue-500/30', label: isEn ? 'Returned' : 'คืนรถเรียบร้อย' };
+      return { bg: 'bg-blue-500/20 text-blue-300 border-blue-500/50 font-semibold', label: isEn ? 'Returned' : 'คืนรถเรียบร้อย' };
     case 'ยกเลิก':
-      return { bg: 'bg-rose-500/15 text-rose-400 border-rose-500/30', label: isEn ? 'Cancelled' : 'ยกเลิกการจอง' };
+      return { bg: 'bg-rose-500/20 text-rose-300 border-rose-500/50 font-semibold', label: isEn ? 'Cancelled' : 'ยกเลิกการจอง' };
     default:
-      return { bg: 'bg-gray-500/15 text-gray-400 border-gray-500/30', label: status };
+      return { bg: 'bg-gray-500/20 text-gray-300 border-gray-500/40 font-semibold', label: status };
   }
 };

@@ -24,7 +24,11 @@ import { AdminBookingsPage } from './pages/admin/AdminBookingsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 
 const MainContent = () => {
-  const { currentView, currentUser } = useApp();
+  const app = useApp();
+  const { currentView, currentUser } = app;
+  if (typeof window !== 'undefined') {
+    window.__app = app;
+  }
 
   // Scroll to top whenever current view changes
   useEffect(() => {

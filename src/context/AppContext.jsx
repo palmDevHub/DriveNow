@@ -485,12 +485,18 @@ export const AppProvider = ({ children }) => {
     };
 
     try {
-      await fetch(`${API_BASE}/bookings`, {
+      const res = await fetch(`${API_BASE}/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBooking),
         credentials: 'include'
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.booking_id) {
+          newBooking.booking_id = data.booking_id;
+        }
+      }
     } catch (e) {}
 
     setBookings(prev => [newBooking, ...prev]);
